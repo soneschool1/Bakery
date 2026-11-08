@@ -313,7 +313,7 @@ export default function StockRechargeForm({
       )}
 
       {/* STEP 1: Current Stock Grid & Selection */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-stone-100 pb-3 gap-3">
           <div>
             <h2 className="text-base font-black text-stone-900 flex items-center space-x-2">
@@ -415,7 +415,7 @@ export default function StockRechargeForm({
         <form 
           ref={step2Ref}
           onSubmit={handleSubmit} 
-          className={`bg-white rounded-3xl border transition-all duration-500 p-6 shadow-xs space-y-6 ${
+          className={`bg-white rounded-3xl border transition-all duration-500 p-4 sm:p-6 shadow-xs space-y-6 ${
             highlightStep2 
               ? 'ring-4 ring-emerald-500/50 border-[#064e3b] shadow-xl shadow-emerald-950/10 scale-[1.005]' 
               : 'border-stone-200'
@@ -529,7 +529,7 @@ export default function StockRechargeForm({
               <label className="block text-xs font-black text-stone-700 mb-1.5">
                 {t('cashier.rechargePaymentSource', 'Paid From (Payment Source) *')}
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cash')}
@@ -599,8 +599,8 @@ export default function StockRechargeForm({
       )}
 
       {/* TODAY'S RECHARGES ACTIVITY LOG */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-100 pb-3 gap-1.5">
           <div>
             <h3 className="text-sm font-black text-stone-900 flex items-center space-x-2">
               <TrendingUp className="w-4 h-4 text-[#064e3b]" />
@@ -661,7 +661,7 @@ export default function StockRechargeForm({
       {/* CASHIER ADD NEW INGREDIENT MODAL */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl space-y-5 animate-in zoom-in-95 border border-stone-200">
+          <div className="bg-white rounded-3xl p-4 sm:p-7 max-w-lg w-full max-h-[92vh] overflow-y-auto shadow-2xl space-y-5 animate-in zoom-in-95 border border-stone-200">
             <div className="flex items-start justify-between border-b border-stone-100 pb-3">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-[#064e3b] flex items-center justify-center font-black">
@@ -709,7 +709,7 @@ export default function StockRechargeForm({
                 <label className="block text-xs font-black text-stone-700 mb-1">
                   {t('admin.colCategory', 'Item Category')} *
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => handleAddCategoryChange('ingredient')}
@@ -754,7 +754,7 @@ export default function StockRechargeForm({
               </div>
 
               {/* Initial Qty, Min Alert, Unit Price */}
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
                   <label className="block text-[11px] font-black text-stone-700 mb-1">
                     {t('admin.colCurrentStock', 'Opening Stock')} ({addUnit})

@@ -76,13 +76,13 @@ export default function CashierDashboard({
       {/* Low Stock Alert Header for Cashier if any ingredients are running low */}
       {lowStockCount > 0 && activeTab !== 'recharge' && (
         <div className="bg-amber-50 border-2 border-amber-400 text-amber-950 rounded-3xl p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl">⚠️</span>
+          <div className="flex items-start sm:items-center space-x-3">
+            <span className="text-2xl shrink-0 mt-0.5 sm:mt-0">⚠️</span>
             <div>
               <div className="text-xs font-black uppercase tracking-wider text-amber-800">
                 {t('cashier.storeRunningLow', 'Store Ingredients Running Low!')}
               </div>
-              <div className="text-sm font-extrabold text-stone-900 mt-0.5">
+              <div className="text-sm font-extrabold text-stone-900 mt-0.5 break-words">
                 {t('cashier.storeRunningLowDesc', '{count} ingredient(s) are below minimum store levels. As cashier, please recharge bakery stock.').replace('{count}', lowStockCount)}
               </div>
             </div>
@@ -90,7 +90,7 @@ export default function CashierDashboard({
           <button
             type="button"
             onClick={() => setActiveTab('recharge')}
-            className="bg-[#064e3b] hover:bg-emerald-900 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all shrink-0 cursor-pointer flex items-center space-x-1"
+            className="bg-[#064e3b] hover:bg-emerald-900 text-white font-black text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all shrink-0 cursor-pointer flex items-center space-x-1 self-start sm:self-auto"
           >
             <span>{t('cashier.openRechargeStation', '📥 Open Stock Recharge Station')}</span>
           </button>
@@ -105,7 +105,7 @@ export default function CashierDashboard({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`shrink-0 w-36 sm:w-auto p-2.5 sm:p-3 rounded-2xl text-center transition-all cursor-pointer relative ${
+              className={`shrink-0 w-32 sm:w-auto p-2 sm:p-3 rounded-2xl text-center transition-all cursor-pointer relative ${
                 activeTab === tab.id
                   ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/25 scale-[1.02] font-black ring-2 ring-emerald-500'
                   : tab.isUrgent

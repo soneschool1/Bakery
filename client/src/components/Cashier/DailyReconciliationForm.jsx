@@ -140,7 +140,7 @@ export default function DailyReconciliationForm({
       </div>
 
       {/* Step 2: Cash Count & Verification */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-6">
         <div>
           <h2 className="text-base font-black text-stone-900 mb-1">
             {t('cashier.physicalDrawerTitle', 'Physical Drawer Cash Count')}
@@ -200,7 +200,7 @@ export default function DailyReconciliationForm({
 
         {/* Live Shortage / Surplus Indicator */}
         {actualCash !== '' && (
-          <div className={`p-4 rounded-2xl border-2 flex items-center justify-between text-sm font-black ${
+          <div className={`p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-sm font-black ${
             isExact 
               ? 'bg-emerald-50 border-emerald-500 text-emerald-900' 
               : isShortage 
@@ -208,16 +208,16 @@ export default function DailyReconciliationForm({
               : 'bg-amber-50 border-amber-500 text-amber-900'
           }`}>
             <div className="flex items-center space-x-2">
-              {isExact && <CheckCircle2 className="w-6 h-6 text-emerald-600" />}
-              {isShortage && <AlertTriangle className="w-6 h-6 text-rose-600" />}
-              {isSurplus && <CheckCircle2 className="w-6 h-6 text-amber-600" />}
-              <span>
+              {isExact && <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />}
+              {isShortage && <AlertTriangle className="w-6 h-6 text-rose-600 shrink-0" />}
+              {isSurplus && <CheckCircle2 className="w-6 h-6 text-amber-600 shrink-0" />}
+              <span className="break-words">
                 {isExact && t('cashier.exactMatch', '🎉 Exact Match! Physical cash perfectly matches expected sales.')}
                 {isShortage && t('cashier.shortageDiff', '⚠️ Shortage: Missing {diff} compared to expected sales.').replace('{diff}', formatETB(-cashDifference))}
                 {isSurplus && t('cashier.surplusDiff', '🎉 Surplus: You have {diff} more than expected sales.').replace('{diff}', formatETB(cashDifference))}
               </span>
             </div>
-            <span className="text-base font-black">
+            <span className="text-base font-black shrink-0">
               {t('cashier.diffLabel', 'Diff: {amount}').replace('{amount}', formatETB(cashDifference))}
             </span>
           </div>
@@ -243,7 +243,7 @@ export default function DailyReconciliationForm({
 
       {/* Daily Closings Log */}
       <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+        <div className="p-4 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div className="flex items-center space-x-2">
             <Clock className="w-4 h-4 text-amber-600" />
             <h3 className="font-black text-stone-900 text-xs uppercase tracking-wider">

@@ -300,8 +300,8 @@ export default function POSView({
         
         {/* Quick Combos if configured */}
         {cashierSuggestions.length > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between shadow-2xs">
-            <span className="text-xs font-black text-amber-900 flex items-center space-x-1.5">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
+            <span className="text-xs font-black text-amber-900 flex items-center space-x-1.5 shrink-0">
               <Sparkles className="w-4 h-4 text-amber-600" />
               <span>{t('pos.quickCombos', 'QUICK COMBOS:')}</span>
             </span>
@@ -351,7 +351,7 @@ export default function POSView({
                 type="button"
                 disabled={isSoldOut}
                 onClick={() => handleSelectItem(prod)}
-                className={`p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-2 text-left transition-all duration-150 flex flex-col justify-between h-36 sm:h-40 relative group ${
+                className={`p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-2 text-left transition-all duration-150 flex flex-col justify-between min-h-[9rem] sm:min-h-[10rem] h-auto relative group ${
                   isSoldOut
                     ? 'bg-stone-100/90 border-stone-200 opacity-60 cursor-not-allowed select-none'
                     : inCart 
@@ -611,43 +611,43 @@ export default function POSView({
             <label className="block text-xs font-bold text-stone-600 uppercase mb-2">
               {t('pos.paymentMethod', 'Payment Method')}
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cash')}
-                className={`py-2 px-3 rounded-2xl border-2 flex items-center justify-center space-x-2 text-xs font-black transition-all cursor-pointer ${
+                className={`py-2 px-1.5 sm:px-3 rounded-2xl border-2 flex items-center justify-center space-x-1 sm:space-x-1.5 text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                   paymentMethod === 'cash'
                     ? 'border-emerald-600 bg-emerald-50 text-emerald-950 shadow-xs scale-102'
                     : 'border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100'
                 }`}
               >
-                <Banknote className="w-4 h-4 text-emerald-600" />
+                <Banknote className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{t('pos.cash', 'Cash')}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setPaymentMethod('bank')}
-                className={`py-2 px-3 rounded-2xl border-2 flex items-center justify-center space-x-2 text-xs font-black transition-all cursor-pointer ${
+                className={`py-2 px-1.5 sm:px-3 rounded-2xl border-2 flex items-center justify-center space-x-1 sm:space-x-1.5 text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                   paymentMethod === 'bank'
                     ? 'border-blue-600 bg-blue-50 text-blue-950 shadow-xs scale-102'
                     : 'border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100'
                 }`}
               >
-                <CreditCard className="w-4 h-4 text-blue-600" />
-                <span>{t('pos.cbeBank', 'CBE / Bank')}</span>
+                <CreditCard className="w-4 h-4 text-blue-600 shrink-0" />
+                <span className="truncate">{t('pos.cbeBank', 'CBE / Bank')}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setPaymentMethod('telebirr')}
-                className={`py-2 px-3 rounded-2xl border-2 flex items-center justify-center space-x-2 text-xs font-black transition-all cursor-pointer ${
+                className={`py-2 px-1.5 sm:px-3 rounded-2xl border-2 flex items-center justify-center space-x-1 sm:space-x-1.5 text-[11px] sm:text-xs font-black transition-all cursor-pointer ${
                   paymentMethod === 'telebirr'
                     ? 'border-amber-600 bg-amber-50 text-amber-950 shadow-xs scale-102'
                     : 'border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100'
                 }`}
               >
-                <Smartphone className="w-4 h-4 text-amber-600" />
+                <Smartphone className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>{t('pos.telebirr', 'Telebirr')}</span>
               </button>
             </div>
@@ -728,7 +728,7 @@ export default function POSView({
 
       {/* Mobile Sticky Floating Cart Bar (Appears when cart has items on screens < lg) */}
       {cart.length > 0 && (
-        <div className="lg:hidden fixed bottom-16 left-3 right-3 z-40 bg-[#064e3b] text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between border border-emerald-500/40 animate-in slide-in-from-bottom-2">
+        <div className="lg:hidden fixed bottom-[4.25rem] sm:bottom-16 left-3 right-3 z-40 bg-[#064e3b] text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between border border-emerald-500/40 animate-in slide-in-from-bottom-2">
           <div className="flex items-center space-x-2.5">
             <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-sm shrink-0">
               {cart.reduce((sum, item) => sum + item.quantity, 0)}

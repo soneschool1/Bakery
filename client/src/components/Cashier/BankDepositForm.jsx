@@ -160,7 +160,7 @@ export default function BankDepositForm({
 
       {/* Deposits History */}
       <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+        <div className="p-4 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <h3 className="font-black text-stone-900 text-xs uppercase tracking-wider">
             {t('cashier.depositLogTitle', 'Bank Deposits Log')}
           </h3>

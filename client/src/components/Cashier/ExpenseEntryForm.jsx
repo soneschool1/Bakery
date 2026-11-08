@@ -121,41 +121,41 @@ export default function ExpenseEntryForm({
     <div className="space-y-6 max-w-5xl mx-auto">
       
       {/* 10 QUICK VARIABLE EXPENSE BUTTONS */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-200 gap-3">
           <div>
             <h2 className="text-base font-black text-stone-900 flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-[#064e3b]" />
+              <Sparkles className="w-5 h-5 text-[#064e3b] shrink-0" />
               <span>{t('cashier.quickExpensesTitle', 'Variable Expenses (Quick Selection):')}</span>
             </h2>
-            <p className="text-xs text-stone-500 font-semibold">
+            <p className="text-xs text-stone-500 font-semibold mt-0.5">
               {t('cashier.quickExpensesDesc', 'Tap any button below to immediately fill the expense form')}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowCustomModal(true)}
-            className="bg-[#064e3b] hover:bg-emerald-900 text-white font-black text-xs px-4 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1 cursor-pointer"
+            className="bg-[#064e3b] hover:bg-emerald-900 text-white font-black text-xs px-4 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-1 cursor-pointer shrink-0 self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
             <span>{t('cashier.addOtherExpenseBtn', '➕ Add Other Expense')}</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
           {variableExpenseButtons.map((btn) => (
             <button
               key={btn.label}
               type="button"
               onClick={() => applyQuickButton(btn)}
-              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between h-24 ${
+              className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between min-h-[5.5rem] h-auto ${
                 category === btn.category
                   ? 'border-[#064e3b] bg-emerald-50/80 shadow-md ring-2 ring-emerald-600/30 font-black'
                   : 'border-stone-200 bg-stone-50 hover:bg-white hover:border-emerald-400 font-bold'
               }`}
             >
-              <div className="text-xs font-black text-stone-900 line-clamp-2">{btn.label}</div>
-              <div className="text-xs font-black text-[#064e3b] mt-1">{formatETB(btn.defaultAmount)}</div>
+              <div className="text-xs font-black text-stone-900 line-clamp-2 break-words">{btn.label}</div>
+              <div className="text-xs font-black text-[#064e3b] mt-1 shrink-0">{formatETB(btn.defaultAmount)}</div>
             </button>
           ))}
         </div>
@@ -170,15 +170,15 @@ export default function ExpenseEntryForm({
       )}
 
       {/* Expense Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-5">
-        <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-200 gap-2">
           <div className="flex items-center space-x-2">
-            <Receipt className="w-5 h-5 text-[#064e3b]" />
-            <h2 className="text-base font-black text-stone-900">
+            <Receipt className="w-5 h-5 text-[#064e3b] shrink-0" />
+            <h2 className="text-base font-black text-stone-900 break-words">
               {t('cashier.recordExpenseTitle', 'Record Variable Expense')}
             </h2>
           </div>
-          <span className="text-xs text-stone-500 font-black">
+          <span className="text-xs text-stone-500 font-black shrink-0">
             {t('cashier.todaysCashOut', "Today's Total Cash Out: {amount}").replace('{amount}', '')}
             <strong className="text-rose-700">{formatETB(todayTotal)}</strong>
           </span>
@@ -230,7 +230,7 @@ export default function ExpenseEntryForm({
             <label className="block text-xs font-black text-stone-700 uppercase mb-1">
               {t('cashier.paymentSourceLabel', 'Payment Source')}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cash')}
@@ -344,7 +344,7 @@ export default function ExpenseEntryForm({
       )}
 
       {/* Today's Expense Log */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-3">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-3">
         <h3 className="font-black text-sm text-stone-900 pb-2 border-b border-stone-200">
           {t('cashier.todaysExpensesTitle', "Today's Recorded Expenses ({count})").replace('{count}', todayExpenses.length)}
         </h3>
@@ -355,12 +355,12 @@ export default function ExpenseEntryForm({
         ) : (
           <div className="space-y-2">
             {todayExpenses.map((exp) => (
-              <div key={exp.id} className="p-3 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-between text-xs">
-                <div>
+              <div key={exp.id} className="p-3 rounded-xl bg-stone-50 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 text-xs">
+                <div className="break-words">
                   <span className="font-bold text-stone-900">{exp.expense_category}</span>
                   <span className="text-stone-400 ml-2">({exp.description})</span>
                 </div>
-                <div className="font-black text-stone-900">
+                <div className="font-black text-stone-900 shrink-0">
                   {formatETB(exp.amount)} <span className="text-[10px] text-stone-400 uppercase">({exp.payment_method})</span>
                 </div>
               </div>

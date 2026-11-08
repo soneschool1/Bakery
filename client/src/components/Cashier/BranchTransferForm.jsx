@@ -393,7 +393,7 @@ export default function BranchTransferForm({
     <div className="space-y-6 max-w-5xl mx-auto">
       
       {/* Branch Transfer Dispatch Card */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-6">
         
         {/* Header Banner */}
         <div className="pb-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -608,7 +608,7 @@ export default function BranchTransferForm({
 
             {/* ACTIVE TRIP SHIPMENT MANIFEST TABLE */}
             <div className="pt-2">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
                 <span className="text-xs font-black text-stone-800 flex items-center space-x-1">
                   <span>📦 Shipment Manifest for This Trip</span>
                   <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full">
@@ -775,7 +775,7 @@ export default function BranchTransferForm({
 
       {/* Transfer History Table */}
       <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+        <div className="p-4 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div className="flex items-center space-x-2">
             <Truck className="w-4 h-4 text-[#0E7452]" />
             <h3 className="font-black text-stone-900 text-xs uppercase tracking-wider">
@@ -884,7 +884,7 @@ export default function BranchTransferForm({
       {isBranchModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
           <div 
-            className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95"
+            className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[92vh] overflow-y-auto space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-stone-100">
@@ -958,7 +958,7 @@ export default function BranchTransferForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsBranchModalOpen(false)}
@@ -983,7 +983,7 @@ export default function BranchTransferForm({
       {isProductModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
           <div 
-            className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95"
+            className="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-4 sm:p-6 max-h-[92vh] overflow-y-auto space-y-4 animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-stone-100">
@@ -1065,7 +1065,7 @@ export default function BranchTransferForm({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3">
                 <button
                   type="button"
                   onClick={() => setIsProductModalOpen(false)}
