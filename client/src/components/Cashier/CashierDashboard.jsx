@@ -20,18 +20,19 @@ import StockRechargeForm from './StockRechargeForm';
 import { useTranslation } from '../../i18n';
 
 export default function CashierDashboard({ 
-  cashier, 
-  products, 
-  finishedStock, 
-  branches, 
-  rawMaterials, 
-  transfers, 
-  closings, 
-  closingSummary, 
-  deposits, 
-  expenses, 
-  flourTracker, 
-  suggestions, 
+  cashier = {}, 
+  products = [], 
+  finishedStock = [], 
+  branches = [], 
+  rawMaterials = [], 
+  transfers = [], 
+  closings = [], 
+  closingSummary = null, 
+  deposits = [], 
+  expenses = [], 
+  flourTracker = null, 
+  suggestions = [], 
+  stockChecks = [],
   onCompleteSale, 
   onSendTransfer, 
   onReceiveTransfer, 
@@ -46,12 +47,13 @@ export default function CashierDashboard({
   onCreateProduct,
   onUpdateProduct,
   onAddMaterial,
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('pos'); // 'pos', 'recharge', 'transfers', 'expenses', 'closing', 'deposits', 'stock_check'
 
-  const lowStockCount = rawMaterials.filter(m => m.current_quantity <= m.minimum_stock).length;
+  const safeMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
+  const lowStockCount = safeMaterials.filter(m => m.current_quantity <= m.minimum_stock).length;
 
   const cashierTabs = [
     { id: 'pos', label: `🛒 ${t('cashier.newSale', 'Sell Bread')}`, desc: t('cashier.newSaleDesc', 'Customer sales from baker stock') },
@@ -196,7 +198,7 @@ export default function CashierDashboard({
       {activeTab === 'stock_check' && (
         <WeeklyStockCheckForm
           rawMaterials={rawMaterials}
-          stockChecks={[]}
+          stockChecks={stockChecks}
           cashier={cashier}
           onSubmitCheck={onSubmitStockCheck}
           onApproveCheck={onApproveStockCheck}

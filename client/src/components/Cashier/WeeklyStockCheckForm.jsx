@@ -1,27 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ClipboardCheck, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 
 export default function WeeklyStockCheckForm({ 
-  rawMaterials, 
-  stockChecks, 
-  cashier, 
+  rawMaterials = [], 
+  stockChecks = [], 
+  cashier = {}, 
   onSubmitCheck, 
   onApproveCheck,
   isAdmin = false,
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
+
+  const safeMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
+  const safeStockChecks = Array.isArray(stockChecks) ? stockChecks : [];
+
   const [counts, setCounts] = useState(() => {
     const initial = {};
-    rawMaterials.forEach(m => {
-      initial[m.id] = {
+    safeMaterials.forEach(m => {
+      const key = m.id || m._id;
+      initial[key] = {
         physical: m.current_quantity,
         explanation: '',
       };
     });
     return initial;
   });
+
+  // Keep counts in sync when materials arrive from server
+  useEffect(() => {
+    if (safeMaterials.length > 0) {
+      setCounts(prev => {
+        const next = { ...prev };
+        let changed = false;
+        safeMaterials.forEach(m => {
+          const key = m.id || m._id;
+          if (!next[key]) {
+            next[key] = { physical: m.current_quantity, explanation: '' };
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+  }, [safeMaterials]);
 
   const [notes, setNotes] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -48,22 +71,23 @@ export default function WeeklyStockCheckForm({
 
   function handleSubmit(e) {
     e.preventDefault();
-    const items = rawMaterials.map(m => {
-      const c = counts[m.id] || { physical: m.current_quantity, explanation: '' };
+    const items = safeMaterials.map(m => {
+      const key = m.id || m._id;
+      const c = counts[key] || { physical: m.current_quantity, explanation: '' };
       return {
-        material_id: m.id,
+        material_id: key,
         material_name: m.name,
         system_quantity: m.current_quantity,
         physical_quantity: c.physical,
         difference: c.physical - m.current_quantity,
-        explanation: c.explanation,
+        explanation: c.explanation || '',
       };
     });
 
     const payload = {
       check_date: new Date().toISOString().slice(0, 10),
-      employee_id: cashier.id || cashier.username,
-      employee_name: cashier.full_name || 'Staff',
+      employee_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      employee_name: cashier?.full_name || 'Staff (Cashier)',
       items,
       notes,
     };
@@ -112,11 +136,12 @@ export default function WeeklyStockCheckForm({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {rawMaterials.map((m) => {
-                  const currentVal = counts[m.id]?.physical !== undefined ? counts[m.id].physical : m.current_quantity;
+                {safeMaterials.map((m) => {
+                  const key = m.id || m._id;
+                  const currentVal = counts[key]?.physical !== undefined ? counts[key].physical : m.current_quantity;
                   const diff = currentVal - m.current_quantity;
                   return (
-                    <tr key={m.id} className="hover:bg-emerald-50/20">
+                    <tr key={key} className="hover:bg-emerald-50/20">
                       <td className="py-3 px-3 font-black text-stone-900">{m.name}</td>
                       <td className="py-3 px-3 text-stone-500 font-bold uppercase">{m.unit}</td>
                       <td className="py-3 px-3 text-right font-mono font-bold text-stone-700">{m.current_quantity}</td>
@@ -125,7 +150,7 @@ export default function WeeklyStockCheckForm({
                           type="number"
                           step="0.01"
                           value={currentVal}
-                          onChange={(e) => handleCountChange(m.id, e.target.value)}
+                          onChange={(e) => handleCountChange(key, e.target.value)}
                           className="w-28 bg-stone-50 border border-stone-300 rounded-lg px-2.5 py-1.5 font-black text-stone-900 focus:bg-white text-xs"
                         />
                       </td>
@@ -138,8 +163,8 @@ export default function WeeklyStockCheckForm({
                         <input
                           type="text"
                           placeholder={t('common.reason', 'Reason if difference...')}
-                          value={counts[m.id]?.explanation || ''}
-                          onChange={(e) => handleExplanationChange(m.id, e.target.value)}
+                          value={counts[key]?.explanation || ''}
+                          onChange={(e) => handleExplanationChange(key, e.target.value)}
                           className="w-full bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs text-stone-800"
                         />
                       </td>

@@ -12,13 +12,13 @@ import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
 
 export default function DailyReconciliationForm({ 
-  summary, 
-  cashier, 
-  closings, 
+  summary = null, 
+  cashier = {}, 
+  closings = [], 
   onSubmitClosing, 
   onReviewClosing,
   isAdmin = false,
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
   const [actualCash, setActualCash] = useState('');
@@ -27,6 +27,7 @@ export default function DailyReconciliationForm({
   const [remarks, setRemarks] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  const safeClosings = Array.isArray(closings) ? closings : [];
   const expectedCash = summary?.expected_cash_amount || 0;
   const actualCashNum = parseFloat(actualCash) || 0;
   const cashDifference = actualCashNum - expectedCash;
@@ -50,8 +51,8 @@ export default function DailyReconciliationForm({
 
     const payload = {
       closing_date: summary?.closing_date || new Date().toISOString().slice(0, 10),
-      cashier_id: cashier.id || cashier.username || 'cashier',
-      cashier_name: cashier.full_name || 'Tigist Haile',
+      cashier_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      cashier_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       branch_id: 'main',
       branch_name: 'Main Bakery & Shop',
       total_quantity_sold: summary?.total_quantity_sold || 0,
@@ -239,6 +240,71 @@ export default function DailyReconciliationForm({
           <span>{t('cashier.submitClosingBtn', 'SUBMIT DAILY CLOSING FOR MANAGER APPROVAL')}</span>
         </button>
       </form>
+
+      {/* Daily Closings Log */}
+      <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-amber-600" />
+            <h3 className="font-black text-stone-900 text-xs uppercase tracking-wider">
+              {t('cashier.closingLogTitle', 'Daily Cash Count History')}
+            </h3>
+          </div>
+          <span className="text-xs text-stone-500 font-bold">{safeClosings.length} closings recorded</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-stone-100/60 text-stone-500 font-bold uppercase text-[10px] border-b border-stone-200">
+              <tr>
+                <th className="py-2.5 px-4">{t('common.date', 'Date')}</th>
+                <th className="py-2.5 px-4">{t('cashier.cashier', 'Cashier')}</th>
+                <th className="py-2.5 px-4 text-right">{t('cashier.expected', 'Expected Cash')}</th>
+                <th className="py-2.5 px-4 text-right">{t('cashier.counted', 'Counted Cash')}</th>
+                <th className="py-2.5 px-4 text-right">{t('cashier.diff', 'Difference')}</th>
+                <th className="py-2.5 px-4 text-right">{t('cashier.bankDeposit', 'Bank Deposit')}</th>
+                <th className="py-2.5 px-4 text-center">{t('common.status', 'Status')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100">
+              {safeClosings.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="py-8 text-center text-stone-400 font-bold">
+                    No daily closings recorded yet.
+                  </td>
+                </tr>
+              ) : (
+                safeClosings.map((cl) => {
+                  const diff = cl.cash_difference || 0;
+                  return (
+                    <tr key={cl.id || cl._id || cl.closing_date} className="hover:bg-amber-50/20">
+                      <td className="py-3 px-4 font-mono text-stone-700">{cl.closing_date}</td>
+                      <td className="py-3 px-4 font-bold text-stone-900">{cl.cashier_name}</td>
+                      <td className="py-3 px-4 text-right font-mono text-stone-600">{formatETB(cl.expected_cash_amount)}</td>
+                      <td className="py-3 px-4 text-right font-mono font-bold text-stone-900">{formatETB(cl.actual_cash_counted)}</td>
+                      <td className={`py-3 px-4 text-right font-mono font-black ${diff < 0 ? 'text-rose-600' : diff > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                        {formatETB(diff)}
+                      </td>
+                      <td className="py-3 px-4 text-right font-mono text-emerald-800 font-bold">{formatETB(cl.bank_deposit_amount || 0)}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          cl.status === 'approved' 
+                            ? 'bg-emerald-100 text-emerald-800' 
+                            : cl.status === 'rejected' 
+                            ? 'bg-rose-100 text-rose-800' 
+                            : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {cl.status || 'pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
     </div>
   );

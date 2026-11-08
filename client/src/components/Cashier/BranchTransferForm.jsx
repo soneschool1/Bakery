@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Truck, 
   Send, 
@@ -24,39 +24,48 @@ import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
 
 export default function BranchTransferForm({ 
-  branches, 
-  products, 
-  finishedStock, 
-  cashier, 
-  transfers, 
+  branches = [], 
+  products = [], 
+  finishedStock = [], 
+  cashier = {}, 
+  transfers = [], 
   onSendTransfer, 
   onReceiveTransfer, 
   onCreateBranch,
   onUpdateBranch,
   onCreateProduct,
   onUpdateProduct,
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
 
-  // Branch & Stock Map (originating from Main Bakery)
-  const mainBranch = branches.find(b => b.is_main);
-  const mainBranchId = mainBranch?.id || '6aec3ad95663067312ab76c2';
-  const otherBranches = branches.filter(b => !b.is_main && b.active);
-  const stockMap = {};
-  finishedStock.forEach(s => {
-    if (s.branch_id === mainBranchId || s.branch_id === 'main' || (!s.branch_id && mainBranch)) {
-      stockMap[s.product_id] = Math.max(0, s.available_quantity || 0);
-    }
-  });
-  finishedStock.forEach(s => {
-    if (stockMap[s.product_id] === undefined) {
-      stockMap[s.product_id] = Math.max(0, s.available_quantity || 0);
-    }
-  });
+  const safeBranches = Array.isArray(branches) ? branches : [];
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeStock = Array.isArray(finishedStock) ? finishedStock : [];
+  const safeTransfers = Array.isArray(transfers) ? transfers : [];
 
-  const [destinationBranchId, setDestinationBranchId] = useState(otherBranches[0]?.id || '');
-  const selectedBranch = branches.find(b => b.id === destinationBranchId);
+  // Branch & Stock Map (originating from Main Bakery)
+  const mainBranch = safeBranches.find(b => b.is_main);
+  const mainBranchId = mainBranch?.id || mainBranch?._id || '6af07ccc1810e6c73550435a';
+  const otherBranches = safeBranches.filter(b => !b.is_main && b.active);
+
+  const stockMap = useMemo(() => {
+    const map = {};
+    safeStock.forEach(s => {
+      if (s.branch_id === mainBranchId || s.branch_id === 'main' || (!s.branch_id && mainBranch)) {
+        map[s.product_id] = Math.max(0, s.available_quantity || 0);
+      }
+    });
+    safeStock.forEach(s => {
+      if (map[s.product_id] === undefined) {
+        map[s.product_id] = Math.max(0, s.available_quantity || 0);
+      }
+    });
+    return map;
+  }, [safeStock, mainBranchId, mainBranch]);
+
+  const [destinationBranchId, setDestinationBranchId] = useState(otherBranches[0]?.id || otherBranches[0]?._id || '');
+  const selectedBranch = safeBranches.find(b => b.id === destinationBranchId || b._id === destinationBranchId);
 
   // Transportation Cost (Paid once for the entire trip)
   const [transportCost, setTransportCost] = useState(250);
@@ -65,12 +74,13 @@ export default function BranchTransferForm({
   // Trip Shipment Manifest (Multi-Product Dispatch Basket)
   // Each item: { productId, name, category, weight_grams, quantity, maxAvailable }
   const [manifestItems, setManifestItems] = useState(() => {
-    const activeProducts = products.filter(p => p.active);
-    const initialProduct = activeProducts.find(p => (stockMap[p.id] || 0) > 0) || activeProducts[0];
+    const activeProducts = safeProducts.filter(p => p.active);
+    const initialProduct = activeProducts.find(p => (stockMap[p.id || p._id] || 0) > 0) || activeProducts[0];
     if (initialProduct) {
-      const stock = stockMap[initialProduct.id] || 0;
+      const pId = initialProduct.id || initialProduct._id;
+      const stock = stockMap[pId] || 0;
       return [{
-        productId: initialProduct.id,
+        productId: pId,
         name: initialProduct.name,
         category: initialProduct.category || 'Bread',
         weight_grams: initialProduct.weight_grams || 100,
@@ -82,11 +92,44 @@ export default function BranchTransferForm({
   });
 
   // Selector for adding more products into the trip
-  const activeProducts = products.filter(p => p.active);
-  const [selectedProductId, setSelectedProductId] = useState(activeProducts[0]?.id || '');
+  const activeProducts = safeProducts.filter(p => p.active);
+  const [selectedProductId, setSelectedProductId] = useState(activeProducts[0]?.id || activeProducts[0]?._id || '');
   const [addQuantity, setAddQuantity] = useState(50);
-  const selectedProduct = products.find(p => p.id === selectedProductId);
-  const availableStock = selectedProduct ? (stockMap[selectedProduct.id] || 0) : 0;
+  const selectedProduct = safeProducts.find(p => p.id === selectedProductId || p._id === selectedProductId);
+  const availableStock = selectedProduct ? (stockMap[selectedProduct.id || selectedProduct._id] || 0) : 0;
+
+  // Auto-synchronize destination branch when branches load
+  useEffect(() => {
+    if (!destinationBranchId && otherBranches.length > 0) {
+      setDestinationBranchId(otherBranches[0].id || otherBranches[0]._id);
+    }
+  }, [destinationBranchId, otherBranches]);
+
+  // Auto-synchronize selected product when products load
+  useEffect(() => {
+    if (!selectedProductId && activeProducts.length > 0) {
+      setSelectedProductId(activeProducts[0].id || activeProducts[0]._id);
+    }
+  }, [selectedProductId, activeProducts]);
+
+  // Auto-populate initial manifest item if empty once products load
+  useEffect(() => {
+    if (manifestItems.length === 0 && activeProducts.length > 0) {
+      const initialProduct = activeProducts.find(p => (stockMap[p.id || p._id] || 0) > 0) || activeProducts[0];
+      if (initialProduct) {
+        const pId = initialProduct.id || initialProduct._id;
+        const stock = stockMap[pId] || 0;
+        setManifestItems([{
+          productId: pId,
+          name: initialProduct.name,
+          category: initialProduct.category || 'Bread',
+          weight_grams: initialProduct.weight_grams || 100,
+          quantity: Math.min(stock, 50) || (stock > 0 ? stock : 1),
+          maxAvailable: stock,
+        }]);
+      }
+    }
+  }, [activeProducts, stockMap]);
 
   // Modals for Adding / Editing Branches
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
@@ -337,8 +380,8 @@ export default function BranchTransferForm({
         weight_grams: m.weight_grams || 0,
       })),
       transportation_cost: Number(transportCost) || 0,
-      sent_by_id: cashier.id || cashier.username,
-      sent_by_name: cashier.full_name || 'Tigist Haile',
+      sent_by_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      sent_by_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       remarks: remarks || `Dispatched ${totalPiecesInTrip} pcs (${manifestItems.length} bread types) in one trip to ${selectedBranch?.name || 'Destination Branch'}`,
     };
 
@@ -739,7 +782,7 @@ export default function BranchTransferForm({
               {t('cashier.transferHistory', 'Branch Transfers Log')}
             </h3>
           </div>
-          <span className="text-xs text-stone-500 font-bold">{transfers.length} transfers recorded</span>
+          <span className="text-xs text-stone-500 font-bold">{safeTransfers.length} transfers recorded</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -757,14 +800,14 @@ export default function BranchTransferForm({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {transfers.length === 0 ? (
+              {safeTransfers.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="py-8 text-center text-stone-400 font-bold">
                     No branch transfers recorded yet.
                   </td>
                 </tr>
               ) : (
-                transfers.map((tr) => (
+                safeTransfers.map((tr) => (
                   <tr key={tr.id || tr.transfer_number} className="hover:bg-emerald-50/20">
                     <td className="py-3 px-4 font-mono font-bold text-[#0E7452]">{tr.transfer_number}</td>
                     <td className="py-3 px-4 text-stone-600">{tr.transfer_date} {tr.transfer_time}</td>
@@ -814,8 +857,8 @@ export default function BranchTransferForm({
                         <button
                           type="button"
                           onClick={() => onReceiveTransfer(tr.id, {
-                            receiver_id: cashier.id || cashier.username,
-                            receiver_name: cashier.full_name || 'Branch Attendant',
+                            receiver_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+                            receiver_name: cashier?.full_name || 'Branch Attendant',
                           })}
                           className="bg-[#0E7452] hover:bg-[#0A573D] text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-xs transition-all cursor-pointer"
                         >

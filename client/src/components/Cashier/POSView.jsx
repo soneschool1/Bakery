@@ -18,13 +18,13 @@ import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
 
 export default function POSView({ 
-  finishedStock, 
-  products, 
-  suggestions, 
-  cashier, 
-  branches = [],
+  finishedStock = [], 
+  products = [], 
+  suggestions = [], 
+  cashier = {}, 
+  branches = [], 
   onCompleteSale, 
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -37,7 +37,12 @@ export default function POSView({
 
   const cartInputRefs = useRef({});
 
-  const cashierSuggestions = suggestions.filter(s => s.role_target === 'cashier' && s.category === 'sales_combo');
+  const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
+  const safeStock = Array.isArray(finishedStock) ? finishedStock : [];
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeBranches = Array.isArray(branches) ? branches : [];
+
+  const cashierSuggestions = safeSuggestions.filter(s => s.role_target === 'cashier' && s.category === 'sales_combo');
   const categories = ['all', 'Bread', 'Cookies', 'Cakes', 'Other Products'];
 
   const categoryLabels = {
@@ -50,37 +55,37 @@ export default function POSView({
 
   // Resolve active branch for the cashier
   const activeBranch = useMemo(() => {
-    if (!branches || branches.length === 0) return null;
+    if (!safeBranches || safeBranches.length === 0) return null;
     if (cashier?.branch_id && cashier.branch_id !== 'main') {
-      return branches.find(b => b.id === cashier.branch_id) || null;
+      return safeBranches.find(b => b.id === cashier.branch_id || b._id === cashier.branch_id) || null;
     }
-    return branches.find(b => b.is_main) || null;
-  }, [branches, cashier]);
+    return safeBranches.find(b => b.is_main) || null;
+  }, [safeBranches, cashier]);
 
-  const activeBranchId = activeBranch?.id || cashier?.branch_id || '6aec3ad95663067312ab76c2';
+  const activeBranchId = activeBranch?.id || activeBranch?._id || cashier?.branch_id || '6af07ccc1810e6c73550435a';
   const activeBranchName = activeBranch?.name || cashier?.branch_name || 'Main Bakery & Shop';
 
   // Map product stock for cashier's active branch (strictly branch-aware, preventing cross-branch clobbering)
   const stockMap = useMemo(() => {
     const map = {};
     // 1. Populate from matching branch stock or 'main' alias
-    finishedStock.forEach(s => {
+    safeStock.forEach(s => {
       if (s.branch_id === activeBranchId || (!s.branch_id && activeBranch?.is_main) || (s.branch_id === 'main' && activeBranch?.is_main)) {
         map[s.product_id] = Math.max(0, s.available_quantity || 0);
       }
     });
 
     // 2. Fallback for any product not yet registered under this branch
-    finishedStock.forEach(s => {
+    safeStock.forEach(s => {
       if (map[s.product_id] === undefined) {
         map[s.product_id] = Math.max(0, s.available_quantity || 0);
       }
     });
 
     return map;
-  }, [finishedStock, activeBranchId, activeBranch]);
+  }, [safeStock, activeBranchId, activeBranch]);
 
-  const availableItems = products.filter(p => p.active && (selectedCategory === 'all' || p.category === selectedCategory)).map(p => {
+  const availableItems = safeProducts.filter(p => p.active && (selectedCategory === 'all' || p.category === selectedCategory)).map(p => {
     const qty = Math.max(0, stockMap[p.id] !== undefined ? stockMap[p.id] : 0);
     return {
       ...p,
@@ -245,8 +250,8 @@ export default function POSView({
     }
 
     const salePayload = {
-      cashier_id: cashier.id || cashier._id || cashier.username || 'cashier',
-      cashier_name: cashier.full_name || 'Tigist Haile (Cashier)',
+      cashier_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      cashier_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       branch_id: activeBranchId,
       branch_name: activeBranchName,
       payment_method: paymentMethod,
@@ -280,7 +285,8 @@ export default function POSView({
         setTimeout(() => setSaleNotice(''), 4500);
       }
     } catch (err) {
-      console.error(err);
+      console.error('POS sale processing error:', err);
+      setSaleNotice(`❌ ${t('pos.saleError', 'Sale failed')}: ${err.message || 'Unknown error'}`);
     }
   }
 
@@ -430,14 +436,28 @@ export default function POSView({
             )}
           </div>
 
-          {/* Quick Sale Success Banner */}
+          {/* Quick Sale Notice / Error Banner */}
           {saleNotice && (
-            <div className="bg-emerald-100 border border-emerald-500 text-emerald-950 font-black text-xs p-3 rounded-2xl flex items-center justify-between shadow-xs animate-in fade-in">
+            <div className={`border font-black text-xs p-3 rounded-2xl flex items-center justify-between shadow-xs animate-in fade-in ${
+              saleNotice.startsWith('❌') 
+                ? 'bg-rose-100 border-rose-500 text-rose-950' 
+                : 'bg-emerald-100 border-emerald-500 text-emerald-950'
+            }`}>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-emerald-700 shrink-0" />
+                {saleNotice.startsWith('❌') ? (
+                  <span className="text-sm">❌</span>
+                ) : (
+                  <CheckCircle className="w-4 h-4 text-emerald-700 shrink-0" />
+                )}
                 <span>{saleNotice}</span>
               </div>
-              <button onClick={() => setSaleNotice('')} className="text-emerald-800 text-sm font-bold">✕</button>
+              <button 
+                type="button"
+                onClick={() => setSaleNotice('')} 
+                className={`${saleNotice.startsWith('❌') ? 'text-rose-800' : 'text-emerald-800'} text-sm font-bold cursor-pointer`}
+              >
+                ✕
+              </button>
             </div>
           )}
 

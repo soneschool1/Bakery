@@ -4,13 +4,14 @@ import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
 
 export default function BankDepositForm({ 
-  deposits, 
-  flourTracker, 
-  cashier, 
+  deposits = [], 
+  flourTracker = null, 
+  cashier = {}, 
   onRecordDeposit, 
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
+  const safeDeposits = Array.isArray(deposits) ? deposits : [];
   const [depositAmount, setDepositAmount] = useState('');
   const [bankName, setBankName] = useState('Commercial Bank of Ethiopia (CBE)');
   const [referenceNumber, setReferenceNumber] = useState('');
@@ -39,8 +40,8 @@ export default function BankDepositForm({
       bankName: bankName,
       bank_name: bankName,
       reference_number: referenceNumber,
-      deposited_by_id: cashier.id || cashier.username,
-      deposited_by_name: cashier.full_name || 'Tigist Haile',
+      deposited_by_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      deposited_by_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       triggered_by_flour_milestone: Boolean(flourTracker?.deposit_reminder_active),
       remarks,
     };
@@ -164,7 +165,7 @@ export default function BankDepositForm({
             {t('cashier.depositLogTitle', 'Bank Deposits Log')}
           </h3>
           <span className="text-xs text-stone-500 font-bold">
-            {t('cashier.depositsCount', '{count} deposits recorded').replace('{count}', deposits.length)}
+            {t('cashier.depositsCount', '{count} deposits recorded').replace('{count}', safeDeposits.length)}
           </span>
         </div>
 
@@ -181,14 +182,14 @@ export default function BankDepositForm({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {deposits.length === 0 ? (
+              {safeDeposits.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="py-8 text-center text-stone-400 font-bold">
                     {t('cashier.noDeposits', 'No bank deposits recorded yet.')}
                   </td>
                 </tr>
               ) : (
-                deposits.map((d) => (
+                safeDeposits.map((d) => (
                   <tr key={d.id || d.reference_number} className="hover:bg-emerald-50/20">
                     <td className="py-3 px-4 font-mono text-stone-600">{d.deposit_date}</td>
                     <td className="py-3 px-4 font-black text-stone-900">{d.bank_name || d.bankName}</td>

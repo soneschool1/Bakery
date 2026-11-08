@@ -564,7 +564,13 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => {
-                      const cashierUser = allUsers.find(u => u.role === 'cashier') || { role: 'cashier', full_name: 'Tigist Haile (Cashier)' };
+                      const cashierUser = allUsers.find(u => u.role === 'cashier') || { 
+                        id: '6af07ccc1810e6c735504360',
+                        username: 'cashier',
+                        role: 'cashier', 
+                        full_name: 'Tigist Haile (Cashier)',
+                        branch_id: '6af07ccc1810e6c73550435a'
+                      };
                       setCurrentUser(cashierUser);
                     }}
                     title={t('common.dockCashier', 'Inspect Cashier POS')}
@@ -657,6 +663,7 @@ export default function App() {
             expenses={variableExpenses}
             flourTracker={flourTracker}
             suggestions={suggestions}
+            stockChecks={stockChecks}
             onCompleteSale={handleCompleteSale}
             onSendTransfer={handleSendTransfer}
             onReceiveTransfer={handleReceiveTransfer}
@@ -719,9 +726,11 @@ export default function App() {
             onDeleteUser={handleDeleteUser}
             onSwitchRole={(role) => {
               const target = allUsers.find(u => u.role === role) || {
+                id: role === 'cashier' ? '6af07ccc1810e6c735504360' : '6af07ccc1810e6c73550435f',
                 role,
                 full_name: role === 'baker' ? 'Dawit Alemu (Head Baker)' : 'Tigist Haile (Cashier)',
                 username: role,
+                branch_id: '6af07ccc1810e6c73550435a',
               };
               setCurrentUser(target);
             }}

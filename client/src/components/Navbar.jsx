@@ -54,9 +54,11 @@ export default function Navbar({
   function switchRole(roleName) {
     if (!isAdmin) return; // Only Admin can switch roles
     const target = allUsers.find(u => u.role === roleName) || {
+      id: roleName === 'cashier' ? '6af07ccc1810e6c735504360' : roleName === 'baker' ? '6af07ccc1810e6c73550435f' : '6af07ccc1810e6c73550435e',
       role: roleName,
       full_name: roleName === 'baker' ? 'Dawit Alemu (Head Baker)' : roleName === 'cashier' ? 'Tigist Haile (Cashier)' : 'Abebe Kebede (Manager)',
       username: roleName,
+      branch_id: '6af07ccc1810e6c73550435a',
     };
     setCurrentUser(target);
   }

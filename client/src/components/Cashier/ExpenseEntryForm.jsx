@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Receipt, Plus, CheckCircle2, Sparkles, DollarSign } from 'lucide-react';
 import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
 
 export default function ExpenseEntryForm({ 
-  rawMaterials, 
-  expenses, 
-  cashier, 
-  suggestions, 
+  rawMaterials = [], 
+  expenses = [], 
+  cashier = {}, 
+  suggestions = [], 
   onAddExpense, 
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
+
+  const safeMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
 
   // Exact 10 items specified by the user + Add Other Expense
   const variableExpenseButtons = [
@@ -36,8 +39,15 @@ export default function ExpenseEntryForm({
 
   // Inventory purchase linking
   const [isInventoryPurchase, setIsInventoryPurchase] = useState(false);
-  const [inventoryMaterialId, setInventoryMaterialId] = useState(rawMaterials[0]?.id || '');
+  const [inventoryMaterialId, setInventoryMaterialId] = useState(safeMaterials[0]?.id || safeMaterials[0]?._id || '');
   const [quantityAdded, setQuantityAdded] = useState('');
+
+  // Auto-select material if empty when materials load
+  useEffect(() => {
+    if (!inventoryMaterialId && safeMaterials.length > 0) {
+      setInventoryMaterialId(safeMaterials[0].id || safeMaterials[0]._id);
+    }
+  }, [inventoryMaterialId, safeMaterials]);
 
   // Custom expense modal toggle
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -49,8 +59,8 @@ export default function ExpenseEntryForm({
     setAmount(String(item.defaultAmount));
     if (item.isInventory) {
       setIsInventoryPurchase(true);
-      const match = rawMaterials.find(m => m.name.toLowerCase().includes(item.matName.toLowerCase()));
-      if (match) setInventoryMaterialId(match.id);
+      const match = safeMaterials.find(m => m.name.toLowerCase().includes(item.matName.toLowerCase()));
+      if (match) setInventoryMaterialId(match.id || match._id);
     } else {
       setIsInventoryPurchase(false);
     }
@@ -75,8 +85,8 @@ export default function ExpenseEntryForm({
       amount: parseFloat(amount),
       expense_date: new Date().toISOString().slice(0, 10),
       payment_method: paymentMethod,
-      recorded_by_id: cashier.id || cashier.username || 'cashier',
-      recorded_by_name: cashier.full_name || 'Tigist Haile',
+      recorded_by_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      recorded_by_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       is_inventory_purchase: Boolean(isInventoryPurchase),
       inventory_material_id: isInventoryPurchase ? inventoryMaterialId : '',
       inventory_quantity_added: isInventoryPurchase ? parseFloat(quantityAdded) || 0 : 0,
@@ -90,7 +100,7 @@ export default function ExpenseEntryForm({
   }
 
   const todayStr = new Date().toISOString().slice(0, 10);
-  const todayExpenses = expenses.filter(e => e.expense_date === todayStr);
+  const todayExpenses = safeExpenses.filter(e => e.expense_date === todayStr);
   const todayTotal = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
@@ -252,8 +262,8 @@ export default function ExpenseEntryForm({
                 onChange={(e) => setInventoryMaterialId(e.target.value)}
                 className="bg-white border border-stone-300 rounded-lg p-2 font-bold"
               >
-                {rawMaterials.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name} ({m.unit})</option>
+                {safeMaterials.map((m) => (
+                  <option key={m.id || m._id} value={m.id || m._id}>{m.name} ({m.unit})</option>
                 ))}
               </select>
               <input

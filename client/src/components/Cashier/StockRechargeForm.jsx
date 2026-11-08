@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Package, 
   Plus, 
@@ -23,9 +23,13 @@ export default function StockRechargeForm({
   cashier = {}, 
   onAddExpense, 
   onAddMaterial,
-  isSubmitting 
+  isSubmitting = false 
 }) {
   const { t } = useTranslation();
+
+  const safeMaterials = Array.isArray(rawMaterials) ? rawMaterials : [];
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+
   // Common material presets
   // SYSTEM RULE: Except for flour (kg), all ingredients are measured in grams (g). Packaging in pieces.
   const materialPresets = [
@@ -41,11 +45,20 @@ export default function StockRechargeForm({
   ];
 
   // Selected material (defaults to first low stock or first material)
-  const lowMaterials = rawMaterials.filter(m => m.current_quantity <= m.minimum_stock);
-  const initialMaterial = lowMaterials[0] || rawMaterials[0] || null;
+  const lowMaterials = safeMaterials.filter(m => m.current_quantity <= m.minimum_stock);
+  const initialMaterial = lowMaterials[0] || safeMaterials[0] || null;
 
-  const [selectedMaterialId, setSelectedMaterialId] = useState(initialMaterial?.id || '');
-  const selectedMaterial = rawMaterials.find(m => m.id === selectedMaterialId) || rawMaterials[0] || null;
+  const [selectedMaterialId, setSelectedMaterialId] = useState(initialMaterial?.id || initialMaterial?._id || '');
+  const selectedMaterial = safeMaterials.find(m => m.id === selectedMaterialId || m._id === selectedMaterialId) || safeMaterials[0] || null;
+
+  useEffect(() => {
+    if (!selectedMaterialId && safeMaterials.length > 0) {
+      const initMat = lowMaterials[0] || safeMaterials[0];
+      if (initMat) {
+        setSelectedMaterialId(initMat.id || initMat._id);
+      }
+    }
+  }, [selectedMaterialId, safeMaterials, lowMaterials]);
 
   // Refs for auto-scroll and focus
   const step2Ref = useRef(null);
@@ -192,12 +205,12 @@ export default function StockRechargeForm({
       amount: Math.round(calculatedTotal * 100) / 100,
       expense_date: new Date().toISOString().slice(0, 10),
       payment_method: paymentMethod,
-      recorded_by_id: cashier.id || cashier.username || 'cashier',
-      recorded_by_name: cashier.full_name || 'Tigist Haile',
+      recorded_by_id: cashier?.id || cashier?._id || cashier?.username || 'cashier',
+      recorded_by_name: cashier?.full_name || 'Tigist Haile (Cashier)',
       is_inventory_purchase: true,
-      inventory_material_id: selectedMaterial.id,
+      inventory_material_id: selectedMaterial.id || selectedMaterial._id,
       inventory_quantity_added: parseFloat(quantityAdded),
-      remarks: remarks || `Recharged by Cashier ${cashier.full_name || 'Tigist'} (Supplier: ${supplierName || 'Standard'})`,
+      remarks: remarks || `Recharged by Cashier ${cashier?.full_name || 'Tigist'} (Supplier: ${supplierName || 'Standard'})`,
     };
 
     onAddExpense(payload);
@@ -209,7 +222,7 @@ export default function StockRechargeForm({
 
   // Filter today's inventory recharges
   const todayStr = new Date().toISOString().slice(0, 10);
-  const todayRecharges = expenses.filter(e => e.is_inventory_purchase && e.expense_date === todayStr);
+  const todayRecharges = safeExpenses.filter(e => e.is_inventory_purchase && e.expense_date === todayStr);
   const totalRechargeSpendToday = todayRecharges.reduce((sum, e) => sum + e.amount, 0);
 
   // Active preset for selected material
