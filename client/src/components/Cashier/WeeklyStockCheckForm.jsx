@@ -102,11 +102,11 @@ export default function WeeklyStockCheckForm({
     <div className="space-y-6 max-w-5xl mx-auto">
       
       {/* Physical Count Form */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
-        <div className="pb-3 border-b border-stone-200 flex items-center justify-between">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="pb-3 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <ClipboardCheck className="w-5 h-5 text-[#064e3b]" />
-            <h2 className="text-base font-black text-stone-900">
+            <ClipboardCheck className="w-5 h-5 text-[#064e3b] shrink-0" />
+            <h2 className="text-base font-black text-stone-900 break-words">
               {t('cashier.weeklyCheckTitle', 'Weekly Physical Inventory Count & Discrepancy Form')}
             </h2>
           </div>

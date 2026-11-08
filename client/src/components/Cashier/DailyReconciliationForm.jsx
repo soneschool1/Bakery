@@ -87,20 +87,20 @@ export default function DailyReconciliationForm({
       )}
 
       {/* Step 1: Automatic System Numbers */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+      <div className="bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-200 gap-2">
           <div className="flex items-center space-x-2">
-            <Calculator className="w-5 h-5 text-amber-600" />
-            <h2 className="text-base font-black text-stone-900">
+            <Calculator className="w-5 h-5 text-amber-600 shrink-0" />
+            <h2 className="text-base font-black text-stone-900 break-words">
               {t('cashier.summaryTitle', "Today's Sales & Cash Summary ({date})").replace('{date}', summary?.closing_date || new Date().toISOString().slice(0, 10))}
             </h2>
           </div>
-          <span className="text-xs text-stone-400 font-semibold">
+          <span className="text-xs text-stone-400 font-semibold shrink-0">
             {t('cashier.autoCalculated', 'Auto-calculated from cash drawer')}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="bg-stone-50 border border-stone-200 p-4 rounded-2xl">
             <div className="text-[11px] font-bold text-stone-500 uppercase">
               {t('cashier.itemsSold', 'Items Sold')}

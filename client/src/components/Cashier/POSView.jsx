@@ -481,10 +481,10 @@ export default function POSView({
                       isSelected ? 'bg-emerald-50/50 ring-1 ring-emerald-300' : ''
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex-1 min-w-0 pr-1">
-                        <div className="font-black text-sm text-stone-900 truncate">{item.product_name}</div>
-                        <div className="text-xs text-stone-500 font-semibold flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-black text-sm text-stone-900 break-words">{item.product_name}</div>
+                        <div className="text-xs text-stone-500 font-semibold flex items-center space-x-2 flex-wrap mt-0.5">
                           <span>{formatETB(item.unit_price)} {t('pos.each', 'each')}</span>
                           <span className="text-stone-300">•</span>
                           <span className="text-[11px] text-stone-400 font-medium">
@@ -493,66 +493,68 @@ export default function POSView({
                         </div>
                       </div>
 
-                      {/* Manual Editable Quantity Box right in the Order section */}
-                      <div className="flex items-center space-x-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                          className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-800 font-black text-base active:scale-95 cursor-pointer transition-transform"
-                          title={t('pos.minus1', 'Minus 1')}
-                        >
-                          -
-                        </button>
-                        
-                        {/* Direct Manual Input for Quantity (Enforced max_stock) */}
-                        <div className="relative">
-                          <input
-                            ref={el => cartInputRefs.current[item.product_id] = el}
-                            type="number"
-                            min="1"
-                            max={item.max_stock}
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value, 10);
-                              if (!isNaN(val)) {
-                                updateQuantity(item.product_id, val);
-                              }
-                            }}
-                            onFocus={(e) => {
-                              e.target.select();
-                              setSelectedCartItemId(item.product_id);
-                            }}
-                            className="w-16 text-center font-black text-base text-[#064e3b] bg-white border-2 border-emerald-400 focus:border-[#064e3b] focus:ring-2 focus:ring-emerald-500/20 rounded-xl py-1 focus:outline-none transition-all shadow-2xs"
-                            title={t('pos.inStoreMax', 'Max available stock: {max} pcs').replace('{max}', item.max_stock)}
-                          />
+                      {/* Manual Editable Quantity Box and Line Total */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1.5 sm:pt-0 border-t border-stone-100 sm:border-0">
+                        <div className="flex items-center space-x-1.5">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                            className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-800 font-black text-base active:scale-95 cursor-pointer transition-transform"
+                            title={t('pos.minus1', 'Minus 1')}
+                          >
+                            -
+                          </button>
+                          
+                          {/* Direct Manual Input for Quantity (Enforced max_stock) */}
+                          <div className="relative">
+                            <input
+                              ref={el => cartInputRefs.current[item.product_id] = el}
+                              type="number"
+                              min="1"
+                              max={item.max_stock}
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                if (!isNaN(val)) {
+                                  updateQuantity(item.product_id, val);
+                                }
+                              }}
+                              onFocus={(e) => {
+                                e.target.select();
+                                setSelectedCartItemId(item.product_id);
+                              }}
+                              className="w-16 text-center font-black text-base text-[#064e3b] bg-white border-2 border-emerald-400 focus:border-[#064e3b] focus:ring-2 focus:ring-emerald-500/20 rounded-xl py-1 focus:outline-none transition-all shadow-2xs"
+                              title={t('pos.inStoreMax', 'Max available stock: {max} pcs').replace('{max}', item.max_stock)}
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={item.quantity >= item.max_stock}
+                            onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-base active:scale-95 transition-transform ${
+                              item.quantity >= item.max_stock
+                                ? 'bg-stone-100 text-stone-300 cursor-not-allowed'
+                                : 'bg-stone-100 hover:bg-stone-200 text-stone-800 cursor-pointer'
+                            }`}
+                            title={item.quantity >= item.max_stock ? t('pos.inStoreMax', 'Max available stock: {max} pcs').replace('{max}', item.max_stock) : t('pos.plus1', 'Plus 1')}
+                          >
+                            +
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.product_id)}
+                            className="w-7 h-7 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center cursor-pointer transition-colors ml-1"
+                            title={t('pos.removeItem', 'Remove item')}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
 
-                        <button
-                          type="button"
-                          disabled={item.quantity >= item.max_stock}
-                          onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                          className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-base active:scale-95 transition-transform ${
-                            item.quantity >= item.max_stock
-                              ? 'bg-stone-100 text-stone-300 cursor-not-allowed'
-                              : 'bg-stone-100 hover:bg-stone-200 text-stone-800 cursor-pointer'
-                          }`}
-                          title={item.quantity >= item.max_stock ? t('pos.inStoreMax', 'Max available stock: {max} pcs').replace('{max}', item.max_stock) : t('pos.plus1', 'Plus 1')}
-                        >
-                          +
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.product_id)}
-                          className="w-7 h-7 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center cursor-pointer transition-colors ml-1"
-                          title={t('pos.removeItem', 'Remove item')}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      <div className="w-20 text-right font-black text-sm text-emerald-800 shrink-0">
-                        {formatETB(item.quantity * item.unit_price)}
+                        <div className="w-20 text-right font-black text-sm text-emerald-800 shrink-0">
+                          {formatETB(item.quantity * item.unit_price)}
+                        </div>
                       </div>
                     </div>
 
@@ -651,20 +653,20 @@ export default function POSView({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
               placeholder={t('pos.customerName', 'Customer name (optional)')}
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:bg-white focus:outline-none"
+              className="text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:bg-white focus:outline-none w-full"
             />
             <input
               type="text"
               placeholder={t('pos.remarks', 'Remarks / Note')}
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              className="text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:bg-white focus:outline-none"
+              className="text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:bg-white focus:outline-none w-full"
             />
           </div>
 

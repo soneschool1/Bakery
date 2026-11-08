@@ -8,18 +8,18 @@ export default function ReceiptModal({ sale, onClose }) {
   if (!sale) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         
         {/* Receipt Printable Area */}
-        <div id="printable-receipt" className="p-6 bg-white text-stone-800">
+        <div id="printable-receipt" className="p-4 sm:p-6 bg-white text-stone-800">
           
           {/* Header */}
           <div className="text-center pb-4 border-b border-dashed border-stone-300">
             <img 
               src="/logo.png" 
               alt="Harbuu Bakery" 
-              className="h-14 w-auto max-w-[140px] object-contain mx-auto mb-2" 
+              className="h-12 sm:h-14 w-auto max-w-[120px] sm:max-w-[140px] object-contain mx-auto mb-2" 
             />
             <h2 className="text-lg font-black text-stone-900 tracking-tight">HARBUU BAKERY</h2>
             <p className="text-[11px] text-stone-500 font-medium">Bole Medhanialem, Addis Ababa</p>
@@ -70,7 +70,7 @@ export default function ReceiptModal({ sale, onClose }) {
               <tbody className="divide-y divide-stone-100">
                 {sale.items?.map((item, idx) => (
                   <tr key={idx} className="py-1">
-                    <td className="py-1.5 font-medium text-stone-800">{item.product_name}</td>
+                    <td className="py-1.5 font-medium text-stone-800 break-words max-w-[130px]">{item.product_name}</td>
                     <td className="py-1.5 text-center text-stone-600">{item.quantity}</td>
                     <td className="py-1.5 text-right text-stone-600">{item.unit_price}</td>
                     <td className="py-1.5 text-right font-bold text-stone-900">{item.total_price}</td>

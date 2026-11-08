@@ -716,7 +716,7 @@ export default function DailySalesViewer({
       </div>
 
       {/* 2. Top Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         {/* Total Sales Revenue */}
         <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -966,17 +966,17 @@ export default function DailySalesViewer({
           </div>
 
           {/* Filter Pills & Search */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             
             {/* Search Box */}
-            <div className="relative">
+            <div className="relative w-full sm:w-56">
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder={t('admin.dailySalesViewer.searchPlaceholder', 'Search receipt, item, customer...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-2xl w-56 font-medium focus:bg-white focus:outline-none focus:border-[#0E7452]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-2xl font-medium focus:bg-white focus:outline-none focus:border-[#0E7452]"
               />
             </div>
 

@@ -524,7 +524,7 @@ export default function ExpenseControlCenter({
       </div>
 
       {/* 2. Top Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Filtered Variable Expenses */}
         <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -1141,7 +1141,7 @@ export default function ExpenseControlCenter({
             )}
 
             <form onSubmit={handleAddSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Expense Date</label>
                   <input
@@ -1167,7 +1167,7 @@ export default function ExpenseControlCenter({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Category</label>
                   <select
@@ -1276,7 +1276,7 @@ export default function ExpenseControlCenter({
             )}
 
             <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Expense Date</label>
                   <input
@@ -1301,7 +1301,7 @@ export default function ExpenseControlCenter({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Category</label>
                   <select

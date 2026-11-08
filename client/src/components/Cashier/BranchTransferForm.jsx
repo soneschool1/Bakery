@@ -931,7 +931,7 @@ export default function BranchTransferForm({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-black text-stone-700 mb-1">
                     Contact Person
@@ -1033,7 +1033,7 @@ export default function BranchTransferForm({
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-black text-stone-700 mb-1">
                     Standard Weight (g)

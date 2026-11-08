@@ -241,7 +241,7 @@ export default function StockControlCenter({
       )}
 
       {/* 4 Overview KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-5 rounded-3xl border border-stone-200 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">{t('admin.stockControlCenter.rawIngredients', 'Raw Ingredients')}</span>
@@ -819,7 +819,7 @@ export default function StockControlCenter({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 mb-1">{t('admin.stockControlCenter.colCategory', 'Category')}</label>
                   <select
@@ -862,7 +862,7 @@ export default function StockControlCenter({
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 mb-1">{t('admin.stockControlCenter.minStockAlert', 'Minimum Stock Alert Level')}</label>
                   <input

@@ -62,7 +62,7 @@ export default function LoginPage({ onLoginSuccess }) {
       </div>
 
       {/* Container Card */}
-      <div className="w-full max-w-md bg-white rounded-[32px] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.04)] p-8 sm:p-10 relative overflow-hidden">
+      <div className="w-full max-w-md bg-white rounded-2xl sm:rounded-[32px] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.04)] p-6 sm:p-10 relative overflow-hidden">
         
         {/* Top Decorative Forest Green Accents */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0E7452] via-[#34A87C] to-[#0E7452]" />
@@ -72,7 +72,7 @@ export default function LoginPage({ onLoginSuccess }) {
           <img 
             src="/logo.png" 
             alt="Harbuu Bakery" 
-            className="mx-auto h-24 sm:h-28 w-auto max-w-[220px] object-contain drop-shadow-sm mb-4 transition-transform hover:scale-105" 
+            className="mx-auto h-20 sm:h-28 w-auto max-w-[180px] sm:max-w-[220px] object-contain drop-shadow-sm mb-3 sm:mb-4 transition-transform hover:scale-105" 
           />
           <div className="inline-flex items-center space-x-2">
             <span className="font-extrabold text-2xl tracking-tight text-gray-900">{t('common.brand', 'Harbuu')}</span>
@@ -90,9 +90,9 @@ export default function LoginPage({ onLoginSuccess }) {
 
         {/* Error Notification */}
         {error && (
-          <div className="mt-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start space-x-2.5 text-xs text-rose-800">
+          <div className="mt-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-start space-x-2.5 text-xs text-rose-800 break-words">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <span className="font-medium">{error}</span>
+            <span className="font-medium break-words">{error}</span>
           </div>
         )}
 

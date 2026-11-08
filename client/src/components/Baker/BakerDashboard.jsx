@@ -494,12 +494,12 @@ export default function BakerDashboard({
 
       {/* Low Stock Warning Banner */}
       {lowStockMaterials.length > 0 && (
-        <div className="bg-rose-50 border-2 border-rose-400 text-rose-950 rounded-2xl p-4 flex items-center justify-between shadow-xs">
-          <div className="flex items-center space-x-3">
-            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+        <div className="bg-rose-50 border-2 border-rose-400 text-rose-950 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-start sm:items-center space-x-3">
+            <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 sm:mt-0" />
             <div>
               <p className="font-black text-xs sm:text-sm">⚠️ LOW STOCK ALERT IN BAKERY STORE:</p>
-              <p className="text-xs font-semibold text-rose-800">
+              <p className="text-xs font-semibold text-rose-800 break-words">
                 {lowStockMaterials.map(m => `${m.name} (${m.current_quantity} ${m.unit} left, min: ${m.minimum_stock})`).join(' • ')}
               </p>
             </div>
@@ -507,7 +507,7 @@ export default function BakerDashboard({
           <button 
             type="button"
             onClick={() => setBakerTab('stock')}
-            className="text-xs font-black bg-rose-600 text-white px-3 py-1.5 rounded-xl hover:bg-rose-700 cursor-pointer shrink-0"
+            className="text-xs font-black bg-rose-600 text-white px-3.5 py-2 rounded-xl hover:bg-rose-700 cursor-pointer shrink-0 self-start sm:self-auto"
           >
             View Stock
           </button>
@@ -1155,7 +1155,7 @@ export default function BakerDashboard({
                 </div>
 
                 {/* Live Dough Yield Estimate */}
-                <div className="text-right bg-white p-4 rounded-xl border border-emerald-200 text-xs shadow-2xs shrink-0 sm:min-w-[200px]">
+                <div className="text-left sm:text-right bg-white p-4 rounded-xl border border-emerald-200 text-xs shadow-2xs w-full sm:w-auto shrink-0 sm:min-w-[200px]">
                   <span className="text-stone-400 font-bold block">Estimated Batch Yield:</span>
                   <span className="text-base font-black text-[#0E7452] block mt-0.5">
                     ~{estimatedDoughTotalG > 0 ? Math.round(estimatedDoughTotalG / (Number(doughGramsPerPiece) || 100)) : 0} pieces
@@ -1273,7 +1273,7 @@ export default function BakerDashboard({
                 </div>
 
                 {/* Total Output Weight Display */}
-                <div className="text-right bg-white p-5 rounded-2xl border border-emerald-300 shadow-xs min-w-[240px]">
+                <div className="text-center sm:text-right bg-white p-4 sm:p-5 rounded-2xl border border-emerald-300 shadow-xs w-full sm:w-auto min-w-0 sm:min-w-[220px]">
                   <div className="text-xs font-extrabold text-stone-400 uppercase tracking-wider">
                     Total Batch Output Weight
                   </div>
@@ -1360,8 +1360,8 @@ export default function BakerDashboard({
               No production batches recorded yet {historyFilter === 'today' ? 'today' : 'in system'}.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full min-w-[650px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                   <tr>
                     <th className="py-3 px-4">Batch #</th>
@@ -1502,7 +1502,7 @@ export default function BakerDashboard({
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs bg-stone-50 p-4 rounded-2xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-stone-50 p-4 rounded-2xl">
               <div>
                 <span className="text-stone-500">Baker:</span> <strong className="text-stone-900 block">{selectedBatchDetails.baker_name}</strong>
               </div>

@@ -188,7 +188,7 @@ export default function RevenueBarChart({
   const spacing = (svgWidth - 65 - (totalClusters * clusterWidth)) / (totalClusters - 1);
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+    <div className="bg-white rounded-3xl border border-gray-100 p-4 sm:p-6 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col justify-between">
       
       {/* Chart Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
@@ -253,10 +253,10 @@ export default function RevenueBarChart({
       </div>
 
       {/* Main SVG Revenue vs Expenses Paired Bar Chart */}
-      <div className="relative w-full overflow-x-auto select-none pt-2">
+      <div className="relative w-full overflow-x-auto select-none pt-2 scrollbar-none">
         <svg 
           viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
-          className="w-full h-auto min-w-[500px] overflow-visible"
+          className="w-full h-auto overflow-visible"
         >
           <defs>
             {/* Pill Drop Shadow */}

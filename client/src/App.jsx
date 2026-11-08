@@ -530,7 +530,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] text-gray-900 flex flex-col font-sans antialiased">
+    <div className="min-h-screen bg-[#F0F2F5] text-gray-900 flex flex-col font-sans antialiased w-full overflow-x-hidden">
       
       {/* 1. Global Navbar with Role Switcher & Live SSE */}
       <Navbar
@@ -552,7 +552,7 @@ export default function App() {
       />
 
       {/* 3. Main Workspace & Pinterest Floating Icon Dock */}
-      <div className="max-w-[1480px] mx-auto w-full px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 pb-24 lg:pb-6 flex-1 flex gap-4 sm:gap-6 items-start">
+      <div className="max-w-[1480px] mx-auto w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-6 pb-24 lg:pb-6 flex-1 flex gap-4 sm:gap-6 items-start min-w-0">
         
         {/* Left Floating Icon Dock (Visible for Baker & Cashier; Admin uses SINO sidebar) */}
         {currentUser?.role !== 'admin' && (

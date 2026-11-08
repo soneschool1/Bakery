@@ -250,30 +250,32 @@ export default function AdminDashboard({
 
       {/* Custom Date Inputs if selected */}
       {dateRange === 'custom' && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-wrap items-center gap-3">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="flex items-center space-x-2 text-xs font-bold text-gray-700">
             <Calendar className="w-4 h-4 text-[#0E7452]" />
             <span>{t('admin.selectDateRange', 'Select Date Range:')}</span>
           </div>
-          <input
-            type="date"
-            value={customStart}
-            onChange={(e) => setCustomStart(e.target.value)}
-            className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 font-bold"
-          />
-          <span className="text-xs text-gray-400 font-bold">to</span>
-          <input
-            type="date"
-            value={customEnd}
-            onChange={(e) => setCustomEnd(e.target.value)}
-            className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 font-bold"
-          />
-          <button
-            onClick={onRefresh}
-            className="bg-[#0E7452] text-white font-bold text-xs px-4 py-1.5 rounded-full shadow-xs cursor-pointer"
-          >
-            {t('admin.applyRange', 'Apply Range')}
-          </button>
+          <div className="flex items-center space-x-2 flex-wrap gap-2">
+            <input
+              type="date"
+              value={customStart}
+              onChange={(e) => setCustomStart(e.target.value)}
+              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 font-bold"
+            />
+            <span className="text-xs text-gray-400 font-bold">to</span>
+            <input
+              type="date"
+              value={customEnd}
+              onChange={(e) => setCustomEnd(e.target.value)}
+              className="text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 font-bold"
+            />
+            <button
+              onClick={onRefresh}
+              className="bg-[#0E7452] text-white font-bold text-xs px-4 py-1.5 rounded-full shadow-xs cursor-pointer"
+            >
+              {t('admin.applyRange', 'Apply Range')}
+            </button>
+          </div>
         </div>
       )}
 
@@ -284,7 +286,7 @@ export default function AdminDashboard({
         <div className="lg:col-span-4 flex flex-col space-y-6">
           
           {/* Card 1A: Forest Green VISA-Style Treasury Card matching the reference */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E7452] via-[#0C6A4B] to-[#074D35] text-white p-6 shadow-[0_10px_30px_rgba(14,116,82,0.25)] flex flex-col justify-between min-h-[190px]">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0E7452] via-[#0C6A4B] to-[#074D35] text-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(14,116,82,0.25)] flex flex-col justify-between min-h-[175px] sm:min-h-[190px]">
             {/* Top row: Brand & Waves */}
             <div className="flex items-center justify-between">
               <span className="font-extrabold tracking-wider text-sm text-emerald-100">
@@ -300,7 +302,7 @@ export default function AdminDashboard({
               <p className="text-[11px] font-medium text-emerald-200/90 tracking-wide uppercase">
                 {t('admin.cashOnHandTitle', 'Estimated Cash On Hand')}
               </p>
-              <div className="text-3xl font-extrabold tracking-tight text-white mt-1">
+              <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1 break-words">
                 {formatETB(kpis.cash_on_hand ?? 0)}
               </div>
             </div>
@@ -316,17 +318,17 @@ export default function AdminDashboard({
           </div>
 
           {/* Card 1B: Sales Revenue Mini-Widget with 1-Click Link to Daily Sales */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex items-center justify-between">
+          <div className="bg-white rounded-3xl border border-gray-100 p-4 sm:p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold text-gray-400">{t('admin.todaysSalesRevenue', "Today's Sales Revenue")}</p>
-              <div className="text-2xl font-black text-gray-900 tracking-tight mt-0.5">
+              <div className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight mt-0.5 break-words">
                 {formatETB(kpis.today_sales ?? 0)}
               </div>
             </div>
             <button
               type="button"
               onClick={() => onNavigateSection && onNavigateSection('daily_sales')}
-              className="flex items-center space-x-1 bg-[#0E7452] hover:bg-[#0c6446] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xs cursor-pointer transition-all active:scale-95"
+              className="flex items-center space-x-1 bg-[#0E7452] hover:bg-[#0c6446] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xs cursor-pointer transition-all active:scale-95 shrink-0"
               title="Open Daily Sales Monitor"
             >
               <span>{t('admin.dailySalesLink', 'Daily Sales')}</span>
@@ -335,13 +337,13 @@ export default function AdminDashboard({
           </div>
 
           {/* Card 1C: Payment / Operations History Table matching reference */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex-1 flex flex-col justify-between">
+          <div className="bg-white rounded-3xl border border-gray-100 p-4 sm:p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <div>
                 <h3 className="font-bold text-gray-900 text-sm tracking-tight">{t('admin.paymentHistoryTitle', 'Payment History')}</h3>
                 <p className="text-[11px] text-gray-400 font-medium">{t('admin.paymentHistorySubtitle', 'Recent operational flow')}</p>
               </div>
-              <div className="flex items-center space-x-1.5">
+              <div className="flex items-center space-x-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={fetchOperationalFlow}
@@ -370,12 +372,12 @@ export default function AdminDashboard({
                 {operationalFlow.map((op) => {
                   const IconComponent = op.icon;
                   return (
-                    <div key={op.id} className="pt-2 flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-2.5">
+                    <div key={op.id} className="pt-2 flex items-center justify-between text-xs gap-2">
+                      <div className="flex items-center space-x-2.5 min-w-0 flex-1">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold shrink-0 ${op.iconBg}`}>
                           <IconComponent className="w-4 h-4" />
                         </div>
-                        <div className="min-w-0 pr-2">
+                        <div className="min-w-0 pr-2 flex-1">
                           <div className="font-bold text-gray-900 truncate">{op.name}</div>
                           <div className="text-[10px] text-gray-400 truncate">
                             {op.date} {op.time ? `• ${op.time}` : ''} • {op.type}
@@ -432,17 +434,17 @@ export default function AdminDashboard({
           {/* Card 3B: Amount of Credit / Operating Expenses */}
           <div 
             onClick={() => onNavigateSection && onNavigateSection('expenses')}
-            className="bg-white rounded-3xl border border-gray-100 p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] cursor-pointer hover:border-[#0E7452]/30 transition-all"
+            className="bg-white rounded-3xl border border-gray-100 p-4 sm:p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)] cursor-pointer hover:border-[#0E7452]/30 transition-all"
             title="Open Expense Control Center"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold text-gray-400">{t('admin.operatingExpenses', 'Operating Expenses')}</p>
-                <div className="text-2xl font-black text-gray-900 tracking-tight mt-0.5">
+                <div className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight mt-0.5 break-words">
                   {formatETB(kpis.today_expenses ?? 0)}
                 </div>
               </div>
-              <div className="flex items-center space-x-1 bg-[#0E7452] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs">
+              <div className="flex items-center space-x-1 bg-[#0E7452] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs shrink-0">
                 <span>Expenses</span>
               </div>
             </div>
@@ -450,7 +452,7 @@ export default function AdminDashboard({
           </div>
 
           {/* Card 3C: Mandatory Payments & Staff Team Avatars matching reference */}
-          <div className="bg-white rounded-3xl border border-gray-100 p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+          <div className="bg-white rounded-3xl border border-gray-100 p-4 sm:p-5 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
             <div className="flex items-center justify-between pb-3">
               <div>
                 <h3 className="font-bold text-gray-900 text-sm tracking-tight">{t('admin.activeTeam', 'Active Bakery Team')}</h3>

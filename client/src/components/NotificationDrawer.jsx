@@ -95,16 +95,16 @@ export default function NotificationDrawer({
                   {getIcon(n.type, n.severity)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className={`text-xs font-bold ${n.read ? 'text-stone-800' : 'text-stone-950'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <p className={`text-xs font-bold break-words ${n.read ? 'text-stone-800' : 'text-stone-950'}`}>
                       {n.title}
                     </p>
-                    <span className="text-[10px] text-stone-400 flex items-center space-x-1">
+                    <span className="text-[10px] text-stone-400 flex items-center space-x-1 shrink-0">
                       <Calendar className="w-2.5 h-2.5" />
                       <span>{formatDateTime(n.created_at)}</span>
                     </span>
                   </div>
-                  <p className="text-xs text-stone-600 mt-0.5 leading-relaxed">
+                  <p className="text-xs text-stone-600 mt-0.5 leading-relaxed break-words">
                     {n.message}
                   </p>
                 </div>

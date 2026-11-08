@@ -27,7 +27,7 @@ export default function ProductionManager({
 
   return (
     <div className="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-stone-200 bg-stone-50 flex items-center justify-between">
+      <div className="p-4 sm:p-5 border-b border-stone-200 bg-stone-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center space-x-2">
           <Wheat className="w-5 h-5 text-[#064e3b]" />
           <h2 className="font-black text-stone-900 text-sm">

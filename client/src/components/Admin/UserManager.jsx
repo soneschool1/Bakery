@@ -270,7 +270,7 @@ export default function UserManager({
       </div>
 
       {/* 2. Top Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
           <div className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Total Users</div>
           <div className="text-2xl font-black text-stone-900 mt-1">{stats.total}</div>
@@ -287,7 +287,7 @@ export default function UserManager({
           <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Bakers</div>
           <div className="text-2xl font-black text-amber-900 mt-1">{stats.bakers}</div>
         </div>
-        <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs col-span-2 sm:col-span-1">
+        <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
           <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Cashiers</div>
           <div className="text-2xl font-black text-emerald-900 mt-1">{stats.cashiers}</div>
         </div>
@@ -306,7 +306,7 @@ export default function UserManager({
           />
         </div>
 
-        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto scrollbar-none pb-1 sm:pb-0">
           {/* Role Filter Pills */}
           <div className="flex items-center space-x-1 bg-stone-100 p-1 rounded-xl">
             {['all', 'admin', 'baker', 'cashier'].map((r) => (
