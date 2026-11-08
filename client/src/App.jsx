@@ -446,16 +446,35 @@ export default function App() {
 
   async function handleAddSuggestion(sug) {
     try {
-      await api.createSuggestion(sug);
+      const res = await api.createSuggestion(sug);
       await loadAllData();
-    } catch (err) { alert(err.message); }
+      return res;
+    } catch (err) {
+      alert(err.message);
+      throw err;
+    }
+  }
+
+  async function handleUpdateSuggestion(id, sug) {
+    try {
+      const res = await api.updateSuggestion(id, sug);
+      await loadAllData();
+      return res;
+    } catch (err) {
+      alert(err.message);
+      throw err;
+    }
   }
 
   async function handleDeleteSuggestion(id) {
     try {
-      await api.deleteSuggestion(id);
+      const res = await api.deleteSuggestion(id);
       await loadAllData();
-    } catch (err) { alert(err.message); }
+      return res;
+    } catch (err) {
+      alert(err.message);
+      throw err;
+    }
   }
 
   async function handleAddUser(usr) {
@@ -731,6 +750,7 @@ export default function App() {
             onUpdateFixedExpense={api.updateFixedExpense}
             onDeleteFixedExpense={handleDeleteFixedExpense}
             onAddSuggestion={handleAddSuggestion}
+            onUpdateSuggestion={handleUpdateSuggestion}
             onDeleteSuggestion={handleDeleteSuggestion}
             onAddUser={handleAddUser}
             onUpdateUser={handleUpdateUser}

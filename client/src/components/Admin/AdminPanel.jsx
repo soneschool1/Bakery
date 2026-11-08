@@ -65,6 +65,7 @@ export default function AdminPanel({
   onUpdateFixedExpense, 
   onDeleteFixedExpense, 
   onAddSuggestion, 
+  onUpdateSuggestion,
   onDeleteSuggestion, 
   onAddUser, 
   onUpdateUser, 
@@ -453,7 +454,10 @@ export default function AdminPanel({
             {settingsSubTab === 'suggestions' && (
               <SuggestionsConfigurator
                 suggestions={suggestions}
+                products={products}
+                rawMaterials={rawMaterials}
                 onAddSuggestion={onAddSuggestion}
+                onUpdateSuggestion={onUpdateSuggestion}
                 onDeleteSuggestion={onDeleteSuggestion}
               />
             )}

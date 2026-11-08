@@ -17,7 +17,7 @@ export default function ExpenseEntryForm({
   const safeExpenses = Array.isArray(expenses) ? expenses : [];
 
   // Exact 10 items specified by the user + Add Other Expense
-  const variableExpenseButtons = [
+  const defaultExpenseButtons = [
     { label: t('cashier.foodEmployees', '🍲 Food for the employees'), category: 'Employee food', defaultAmount: 250 },
     { label: t('cashier.transportationBranches', '🛺 Transportation to other branches'), category: 'Transportation for sending bread to other branches', defaultAmount: 300 },
     { label: t('cashier.flourPurchase', '🌾 Flour purchase'), category: 'Flour purchases', defaultAmount: 4250, isInventory: true, matName: 'Flour' },
@@ -29,6 +29,20 @@ export default function ExpenseEntryForm({
     { label: t('cashier.plasticBagPurchase', '🛍️ Plastic bag purchase'), category: 'Plastic bag purchases', defaultAmount: 750, isInventory: true, matName: 'Plastic bags' },
     { label: t('cashier.paperBagPurchase', '📦 Paper bag purchase'), category: 'Paper bag purchases', defaultAmount: 600, isInventory: true, matName: 'Paper bags' },
   ];
+
+  // Custom Cashier Expense Shortcuts configured by Manager/Admin
+  const customExpenseButtons = (suggestions || [])
+    .filter(s => s.role_target === 'cashier' && (s.category === 'expense_category' || s.category === 'expense'))
+    .map(s => ({
+      id: s.id,
+      label: s.title,
+      category: s.payload?.category || 'Employee food',
+      defaultAmount: Number(s.payload?.amount) || 0,
+      description: s.payload?.description || s.title,
+      isCustom: true
+    }));
+
+  const variableExpenseButtons = [...defaultExpenseButtons, ...customExpenseButtons];
 
   const [category, setCategory] = useState('Employee food');
   const [description, setDescription] = useState(t('cashier.foodEmployees', 'Lunch for bakery staff'));
