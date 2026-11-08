@@ -47,6 +47,15 @@ func main() {
 
 	api := router.Group("/api")
 	{
+		// System Health Check
+		api.Match([]string{"GET", "HEAD"}, "/health", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"status":    "healthy",
+				"service":   "harbuu-bakery-api",
+				"timestamp": time.Now().UTC(),
+			})
+		})
+
 		// Authentication & Users
 		api.POST("/auth/login", handlers.Login)
 		api.GET("/users", handlers.GetUsers)
