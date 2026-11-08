@@ -1,0 +1,12 @@
+{
+  "name": "harbuu",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
+    "backend": "cd backend && go run main.go",
+    "server": "cd backend && ./server.exe"
+  }
+}

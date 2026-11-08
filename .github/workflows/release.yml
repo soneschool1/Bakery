@@ -1,0 +1,63 @@
+name: Harbuu Bakery Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+          cache-dependency-path: backend/go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Build Frontend Bundle
+        run: |
+          cd client
+          npm ci
+          npm run build
+
+      - name: Compile Backend Binaries (Cross-Platform)
+        run: |
+          mkdir -p release-pkg/bin release-pkg/dist
+          cp -r client/dist/* release-pkg/dist/
+          cd backend
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ../release-pkg/bin/harbuu-backend-linux-amd64 main.go
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o ../release-pkg/bin/harbuu-backend-windows-amd64.exe main.go
+
+      - name: Package Release Archives
+        run: |
+          tar -czf harbuu-bakery-linux.tar.gz -C release-pkg bin/harbuu-backend-linux-amd64 dist
+          zip -r harbuu-bakery-windows.zip release-pkg/bin/harbuu-backend-windows-amd64.exe release-pkg/dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            harbuu-bakery-linux.tar.gz
+            harbuu-bakery-windows.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
