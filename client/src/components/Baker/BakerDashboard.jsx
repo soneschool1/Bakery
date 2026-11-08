@@ -637,58 +637,6 @@ export default function BakerDashboard({
             </div>
           </div>
 
-          {/* Quick 1-Tap Recipe Presets Row */}
-          <div className="bg-amber-50/60 border border-amber-200 rounded-3xl p-4 shadow-xs space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span className="text-xs font-extrabold text-amber-950">
-                  ⚡ 1-Tap Quick Recipe Presets (Autofill Entire Batch):
-                </span>
-              </div>
-              <span className="text-[11px] font-bold text-amber-800">Tap to load preset</span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {defaultPresets.map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleApplyPreset(preset)}
-                  className="px-3.5 py-2 rounded-xl text-xs font-black bg-white hover:bg-amber-100/60 border border-amber-300 text-stone-900 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center space-x-1.5"
-                >
-                  <span>{preset.label}</span>
-                </button>
-              ))}
-
-              {/* Admin custom suggestions */}
-              {bakerSuggestions.map((sug) => (
-                <button
-                  key={sug.id}
-                  type="button"
-                  onClick={() => {
-                    if (sug.payload) {
-                      handleApplyPreset({
-                        label: sug.title || sug.label,
-                        cat: sug.payload.category || 'Bread',
-                        flour: String(sug.payload.flour_kg || 35),
-                        maj: String(sug.payload.maj_g || 500),
-                        yeast: String(sug.payload.yeast_g || 250),
-                        salt: String(sug.payload.salt_g || 500),
-                        weight: String(sug.payload.dough_weight_g || 100),
-                        pieces: sug.payload.pieces_produced || 500
-                      });
-                    }
-                  }}
-                  className="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 shadow-2xs transition-all cursor-pointer flex items-center space-x-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{sug.title || sug.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* STEP 1: CHOOSE BAKING CATEGORY */}
           {(viewMode === 'scroll' || activeStep === 1) && (
             <div 
@@ -1315,6 +1263,58 @@ export default function BakerDashboard({
               </div>
             </div>
           )}
+
+          {/* Quick 1-Tap Recipe Presets Row (Moved to Bottom) */}
+          <div className="bg-amber-50/60 border border-amber-200 rounded-3xl p-4 shadow-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="text-xs font-extrabold text-amber-950">
+                  ⚡ 1-Tap Quick Recipe Presets (Autofill Entire Batch):
+                </span>
+              </div>
+              <span className="text-[11px] font-bold text-amber-800">Tap to load preset</span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {defaultPresets.map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleApplyPreset(preset)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-black bg-white hover:bg-amber-100/60 border border-amber-300 text-stone-900 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <span>{preset.label}</span>
+                </button>
+              ))}
+
+              {/* Admin custom suggestions */}
+              {bakerSuggestions.map((sug) => (
+                <button
+                  key={sug.id}
+                  type="button"
+                  onClick={() => {
+                    if (sug.payload) {
+                      handleApplyPreset({
+                        label: sug.title || sug.label,
+                        cat: sug.payload.category || 'Bread',
+                        flour: String(sug.payload.flour_kg || 35),
+                        maj: String(sug.payload.maj_g || 500),
+                        yeast: String(sug.payload.yeast_g || 250),
+                        salt: String(sug.payload.salt_g || 500),
+                        weight: String(sug.payload.dough_weight_g || 100),
+                        pieces: sug.payload.pieces_produced || 500
+                      });
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 shadow-2xs transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{sug.title || sug.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
         </div>
       )}
