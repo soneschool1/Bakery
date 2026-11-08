@@ -31,7 +31,7 @@ export const api = {
   getUsers: () => request('/users'),
   createUser: (user) => request('/users', { method: 'POST', body: user }),
   updateUser: (id, user) => request(`/users/${id}`, { method: 'PUT', body: user }),
-  deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
+  deleteUser: (id, params = '') => request(`/users/${id}${params ? '?' + params : ''}`, { method: 'DELETE' }),
 
   // Products
   getProducts: (params = '') => request(`/products${params ? '?' + params : ''}`),

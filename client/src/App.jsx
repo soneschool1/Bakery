@@ -460,23 +460,34 @@ export default function App() {
 
   async function handleAddUser(usr) {
     try {
-      await api.createUser(usr);
+      const created = await api.createUser(usr);
       await loadAllData();
-    } catch (err) { alert(err.message); }
+      return created;
+    } catch (err) { 
+      alert(`User creation error: ${err.message}`); 
+      throw err;
+    }
   }
 
   async function handleUpdateUser(id, usr) {
     try {
-      await api.updateUser(id, usr);
+      const updated = await api.updateUser(id, usr);
       await loadAllData();
-    } catch (err) { alert(err.message); }
+      return updated;
+    } catch (err) { 
+      alert(`User update error: ${err.message}`); 
+      throw err;
+    }
   }
 
-  async function handleDeleteUser(id) {
+  async function handleDeleteUser(id, permanent = false) {
     try {
-      await api.deleteUser(id);
+      await api.deleteUser(id, permanent ? 'permanent=true' : '');
       await loadAllData();
-    } catch (err) { alert(err.message); }
+    } catch (err) { 
+      alert(`User action error: ${err.message}`); 
+      throw err;
+    }
   }
 
   async function handleMarkNotificationRead(id) {

@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  Wheat, 
   Lock, 
   User, 
   Phone,
   ArrowRight, 
-  ShieldCheck, 
-  Store, 
   Eye, 
   EyeOff, 
-  AlertCircle,
-  KeyRound
+  AlertCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useTranslation } from '../../i18n';
@@ -18,50 +14,11 @@ import LanguageSelector from '../LanguageSelector';
 
 export default function LoginPage({ onLoginSuccess }) {
   const { t } = useTranslation();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const demoAccounts = [
-    {
-      role: 'admin',
-      label: t('nav.admin', 'Administrator'),
-      name: 'Abebe Kebede (Manager)',
-      desc: t('auth.fullAccess', 'Executive access & account management'),
-      username: 'admin',
-      phone: '0911223344',
-      password: 'admin123',
-      icon: ShieldCheck,
-      badge: t('auth.fullAccess', 'Full Access'),
-      badgeColor: 'bg-[#E8F6F2] text-[#0E7452] border-[#CDEAE1]',
-    },
-    {
-      role: 'baker',
-      label: t('nav.baker', 'Head Baker'),
-      name: 'Dawit Alemu (Head Baker)',
-      desc: t('auth.productionOnly', 'Baking batches, flour & recipes'),
-      username: 'baker',
-      phone: '0912345678',
-      password: 'baker123',
-      icon: Wheat,
-      badge: t('auth.productionOnly', 'Production Only'),
-      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
-    },
-    {
-      role: 'cashier',
-      label: t('nav.cashier', 'Sales Cashier'),
-      name: 'Tigist Haile (Cashier)',
-      desc: t('auth.posOnly', 'POS, cash closing & bank deposit'),
-      username: 'cashier',
-      phone: '0913456789',
-      password: 'cashier123',
-      icon: Store,
-      badge: t('auth.posOnly', 'POS Only'),
-      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    },
-  ];
 
   async function handleLoginWith(userVal, passVal) {
     const u = (userVal || '').trim();
@@ -91,13 +48,6 @@ export default function LoginPage({ onLoginSuccess }) {
   async function handleLogin(e) {
     if (e) e.preventDefault();
     await handleLoginWith(username, password);
-  }
-
-  async function handleSelectDemo(acc) {
-    setUsername(acc.username);
-    setPassword(acc.password);
-    setError('');
-    await handleLoginWith(acc.username, acc.password);
   }
 
   // Detect whether current input is phone or username
@@ -209,60 +159,9 @@ export default function LoginPage({ onLoginSuccess }) {
           </button>
         </form>
 
-        {/* 1-Click Role Accounts */}
-        <div className="mt-8 pt-6 border-t border-gray-100">
-          <div className="flex items-center justify-between mb-3 px-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
-              {t('auth.demoAccounts', 'Quick Role Autofill')}
-            </span>
-            <span className="text-[10px] font-semibold text-[#0E7452] bg-[#E8F6F2] px-2 py-0.5 rounded-full">
-              {t('common.brand', 'Harbuu')}
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            {demoAccounts.map((acc) => {
-              const IconComp = acc.icon;
-              const isSelected = username === acc.username || username === acc.phone;
-              return (
-                <button
-                  key={acc.role}
-                  type="button"
-                  onClick={() => handleSelectDemo(acc)}
-                  className={`w-full p-2.5 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
-                    isSelected 
-                      ? 'border-[#0E7452] bg-[#E8F6F2]/40 ring-1 ring-[#0E7452]'
-                      : 'border-gray-100 bg-[#F9FAFB] hover:bg-gray-100/70'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2.5 truncate">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                      isSelected ? 'bg-[#0E7452] text-white' : 'bg-gray-200 text-gray-600'
-                    }`}>
-                      <IconComp className="w-4 h-4" />
-                    </div>
-                    <div className="truncate">
-                      <div className="text-xs font-bold text-gray-900 truncate">
-                        {acc.label} <span className="text-[10px] text-gray-400 font-normal">({acc.username} • {acc.phone})</span>
-                      </div>
-                      <div className="text-[10px] text-gray-400 font-medium truncate">{acc.name}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-1.5 shrink-0 ml-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${acc.badgeColor}`}>
-                      {acc.badge}
-                    </span>
-                    <span className="text-xs font-bold text-[#0E7452]">{t('auth.signIn', 'Sign In')} →</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Security Note */}
-        <p className="mt-6 text-center text-[11px] text-gray-400 font-medium">
-          🔒 Only Administrator accounts have permission to switch and access other user roles.
+        <p className="mt-8 text-center text-[11px] text-gray-400 font-medium">
+          🔒 Enter your assigned employee username or registered phone number to access your workspace.
         </p>
 
       </div>

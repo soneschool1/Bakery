@@ -204,6 +204,11 @@ func UpdateUser(c *gin.Context) {
 	delete(updateData, "_id")
 	delete(updateData, "id")
 
+	// If password is empty or only whitespace, do NOT overwrite the existing password
+	if pw, ok := updateData["password"].(string); ok && strings.TrimSpace(pw) == "" {
+		delete(updateData, "password")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -227,7 +232,18 @@ func DeleteUser(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Soft delete
+	permanent := c.Query("permanent") == "true"
+	if permanent {
+		_, err = config.DB.Users.DeleteOne(ctx, bson.M{"_id": objID})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "User permanently deleted"})
+		return
+	}
+
+	// Soft delete / deactivate
 	_, err = config.DB.Users.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"active": false}})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

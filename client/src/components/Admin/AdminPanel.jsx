@@ -443,6 +443,7 @@ export default function AdminPanel({
               <UserManager
                 users={users}
                 branches={branches}
+                admin={admin}
                 onAddUser={onAddUser}
                 onUpdateUser={onUpdateUser}
                 onDeleteUser={onDeleteUser}
