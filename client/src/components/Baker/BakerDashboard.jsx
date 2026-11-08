@@ -446,11 +446,11 @@ export default function BakerDashboard({
       
       {/* Baker Main Header Bar */}
       <div className="bg-white rounded-3xl border border-stone-200 p-2.5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center space-x-2 w-full sm:w-auto">
+        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto scrollbar-none pb-1 sm:pb-0">
           <button
             type="button"
             onClick={() => setBakerTab('baking')}
-            className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+            className={`shrink-0 flex-none px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
               bakerTab === 'baking'
                 ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/20 scale-[1.02]'
                 : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
@@ -463,27 +463,27 @@ export default function BakerDashboard({
           <button
             type="button"
             onClick={() => setBakerTab('history')}
-            className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+            className={`shrink-0 flex-none px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
               bakerTab === 'history'
                 ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/20 scale-[1.02]'
                 : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
             }`}
           >
             <History className="w-4 h-4 text-emerald-300" />
-            <span>📜 Production History ({todayBatches.length})</span>
+            <span>📜 History ({todayBatches.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setBakerTab('stock')}
-            className={`flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+            className={`shrink-0 flex-none px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer ${
               bakerTab === 'stock'
                 ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/20 scale-[1.02]'
                 : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
             }`}
           >
             <Package className="w-4 h-4 text-emerald-300" />
-            <span>📦 Store Ingredients ({rawMaterials.length})</span>
+            <span>📦 Store Stock ({rawMaterials.length})</span>
           </button>
         </div>
 
@@ -588,8 +588,8 @@ export default function BakerDashboard({
               </div>
             </div>
 
-            {/* Clickable 5-Step Progress Pills */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {/* Clickable 5-Step Progress Pills (Horizontal swipeable on mobile) */}
+            <div className="overflow-x-auto flex sm:grid sm:grid-cols-5 gap-2 scrollbar-none pb-1 sm:pb-0">
               {stepTitles.map((step) => {
                 const isActive = activeStep === step.num;
                 const isCompleted = activeStep > step.num;
@@ -598,7 +598,7 @@ export default function BakerDashboard({
                     key={step.num}
                     type="button"
                     onClick={() => jumpToStep(step.num)}
-                    className={`p-3 rounded-2xl text-left border-2 transition-all cursor-pointer flex items-center space-x-2.5 ${
+                    className={`shrink-0 w-36 sm:w-auto p-2.5 sm:p-3 rounded-2xl text-left border-2 transition-all cursor-pointer flex items-center space-x-2.5 ${
                       isActive
                         ? 'border-[#064e3b] bg-emerald-50/80 shadow-xs ring-2 ring-emerald-500/20'
                         : isCompleted

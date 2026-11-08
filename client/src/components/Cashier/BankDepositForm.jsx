@@ -169,8 +169,8 @@ export default function BankDepositForm({
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto scrollbar-none">
+          <table className="w-full min-w-[550px] text-left text-xs">
             <thead className="bg-stone-100 text-stone-500 font-bold uppercase text-[10px] border-b border-stone-200">
               <tr>
                 <th className="py-2.5 px-4">{t('common.date', 'Date')}</th>

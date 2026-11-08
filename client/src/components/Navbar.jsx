@@ -76,33 +76,33 @@ export default function Navbar({
   return (
     <>
       {isImpersonating && (
-        <div className="bg-amber-600 text-white px-4 sm:px-8 py-2 text-xs font-black flex items-center justify-between shadow-xs sticky top-0 z-50">
-          <div className="flex items-center space-x-2">
+        <div className="bg-amber-600 text-white px-3 sm:px-8 py-1.5 sm:py-2 text-xs font-black flex items-center justify-between gap-2 shadow-xs sticky top-0 z-50">
+          <div className="flex items-center space-x-2 truncate">
             <ShieldCheck className="w-4 h-4 text-amber-200 shrink-0" />
-            <span>Admin Inspection: Currently testing <strong>{currentUser?.role === 'baker' ? '🥖 Baker Production Desk' : '🏪 Cashier POS Desk'}</strong></span>
+            <span className="truncate">Admin Mode: <strong>{currentUser?.role === 'baker' ? '🥖 Baker Desk' : '🏪 Cashier POS'}</strong></span>
           </div>
           <button
             type="button"
             onClick={returnToAdmin}
-            className="bg-white text-amber-900 px-3 py-1 rounded-xl text-xs font-black hover:bg-amber-50 cursor-pointer shadow-xs transition-transform active:scale-95 shrink-0"
+            className="bg-white text-amber-900 px-2.5 py-1 rounded-xl text-xs font-black hover:bg-amber-50 cursor-pointer shadow-xs transition-transform active:scale-95 shrink-0"
           >
-            ← Return to Admin Portal
+            ← Admin
           </button>
         </div>
       )}
-      <header className="sticky top-0 z-40 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 sm:px-6 lg:px-8 shadow-xs">
-      <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 h-14 sm:h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-3 sm:px-6 lg:px-8 shadow-xs">
+      <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Brand Logo & SINO Badges */}
-        <div className="flex items-center space-x-3 shrink-0">
+        <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
           <img 
             src="/logo.png" 
             alt="Harbuu Bakery" 
-            className="h-9 sm:h-10 w-auto max-w-[95px] object-contain shrink-0 drop-shadow-2xs" 
+            className="h-8 sm:h-10 w-auto max-w-[80px] sm:max-w-[95px] object-contain shrink-0 drop-shadow-2xs" 
           />
-          <div className="flex items-center space-x-2">
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">Harbuu</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-[#E8F6F2] text-[#0E7452] border border-[#CDEAE1] px-2 py-0.5 rounded-full">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <span className="font-extrabold text-base sm:text-xl tracking-tight text-slate-900 dark:text-white">Harbuu</span>
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#E8F6F2] text-[#0E7452] border border-[#CDEAE1] px-1.5 sm:px-2 py-0.5 rounded-full">
               Bakery
             </span>
           </div>
@@ -187,7 +187,7 @@ export default function Navbar({
         )}
 
         {/* Right Status, Flour Milestone, Language Selector, Notifications & Profile Menu */}
-        <div className="flex items-center space-x-2.5 shrink-0">
+        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
           {/* Language Selector Dropdown */}
           <LanguageSelector />
 
@@ -201,7 +201,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={onOpenNotifications}
-            className="relative w-9 h-9 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+            className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />

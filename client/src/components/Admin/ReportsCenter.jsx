@@ -374,8 +374,8 @@ export default function ReportsCenter() {
 
           {/* Generic tabular preview for lists */}
           {Array.isArray(reportData.data) && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full min-w-[550px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                   <tr>
                     {Object.keys(reportData.data[0] || {}).filter(k => k !== '_id' && k !== 'id' && typeof reportData.data[0][k] !== 'object').slice(0, 6).map(k => (
@@ -402,8 +402,8 @@ export default function ReportsCenter() {
 
           {/* Ingredient consumption summary preview */}
           {selectedReport === 'ingredient_consumption' && typeof reportData.data === 'object' && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full min-w-[550px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px]">
                   <tr>
                     <th className="py-2.5 px-3">{t('admin.reportsCenter.colIngredient', 'Ingredient')}</th>

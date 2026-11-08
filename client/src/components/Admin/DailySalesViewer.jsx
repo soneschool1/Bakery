@@ -1029,8 +1029,8 @@ export default function DailySalesViewer({
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto scrollbar-none">
+            <table className="w-full min-w-[680px] text-left text-xs">
               <thead>
                 <tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
                   <th className="py-3 px-3">{t('admin.dailySalesViewer.colTime', 'Time')}</th>

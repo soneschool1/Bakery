@@ -617,8 +617,8 @@ export default function StockRechargeForm({
             {t('cashier.noExpensesToday', 'No stock recharges recorded today yet.')}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto scrollbar-none">
+            <table className="w-full min-w-[620px] text-left text-xs">
               <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                 <tr>
                   <th className="py-2.5 px-3">{t('common.date', 'Date')} / {t('common.time', 'Time')}</th>

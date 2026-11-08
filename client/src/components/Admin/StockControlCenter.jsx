@@ -387,8 +387,8 @@ export default function StockControlCenter({
 
           {/* Raw Materials Table */}
           <div className="bg-white rounded-3xl border border-stone-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full min-w-[750px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                   <tr>
                     <th className="py-3 px-4">{t('admin.stockControlCenter.colItemName', 'Item Name')}</th>
@@ -511,8 +511,8 @@ export default function StockControlCenter({
 
           {/* Finished Stock Table */}
           <div className="bg-white rounded-3xl border border-stone-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto scrollbar-none">
+              <table className="w-full min-w-[700px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                   <tr>
                     <th className="py-3 px-4">{t('admin.stockControlCenter.colProduct', 'Product Variety')}</th>

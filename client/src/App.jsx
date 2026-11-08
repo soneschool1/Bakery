@@ -21,7 +21,8 @@ import {
   FileText, 
   Settings, 
   Landmark,
-  LogOut 
+  LogOut,
+  Bell
 } from 'lucide-react';
 
 export default function App() {
@@ -551,7 +552,7 @@ export default function App() {
       />
 
       {/* 3. Main Workspace & Pinterest Floating Icon Dock */}
-      <div className="max-w-[1480px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex gap-6 items-start">
+      <div className="max-w-[1480px] mx-auto w-full px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 pb-24 lg:pb-6 flex-1 flex gap-4 sm:gap-6 items-start">
         
         {/* Left Floating Icon Dock (Visible for Baker & Cashier; Admin uses SINO sidebar) */}
         {currentUser?.role !== 'admin' && (
@@ -787,6 +788,111 @@ export default function App() {
         onMarkRead={handleMarkNotificationRead}
         onMarkAllRead={handleMarkAllNotificationsRead}
       />
+
+      {/* 5. Mobile Bottom Navigation Dock (Sticky on mobile & tablets < lg) */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-gray-200/90 dark:border-slate-800 py-1.5 px-3 flex items-center justify-around shadow-[0_-4px_24px_rgba(0,0,0,0.06)] no-print">
+        {authUser?.role === 'admin' ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                const adminUser = allUsers.find(u => u.role === 'admin') || authUser;
+                setCurrentUser(adminUser);
+              }}
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all cursor-pointer ${
+                currentUser?.role === 'admin'
+                  ? 'text-[#0E7452] font-black'
+                  : 'text-gray-400 hover:text-gray-700 font-medium'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Admin</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const bakerUser = allUsers.find(u => u.role === 'baker') || { role: 'baker', full_name: 'Dawit Alemu (Head Baker)' };
+                setCurrentUser(bakerUser);
+              }}
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all cursor-pointer ${
+                currentUser?.role === 'baker'
+                  ? 'text-[#0E7452] font-black'
+                  : 'text-gray-400 hover:text-gray-700 font-medium'
+              }`}
+            >
+              <Wheat className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Baker</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const cashierUser = allUsers.find(u => u.role === 'cashier') || { 
+                  id: '6af07ccc1810e6c735504360',
+                  username: 'cashier',
+                  role: 'cashier', 
+                  full_name: 'Tigist Haile (Cashier)',
+                  branch_id: '6af07ccc1810e6c73550435a'
+                };
+                setCurrentUser(cashierUser);
+              }}
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all cursor-pointer ${
+                currentUser?.role === 'cashier'
+                  ? 'text-[#0E7452] font-black'
+                  : 'text-gray-400 hover:text-gray-700 font-medium'
+              }`}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Cashier</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsNotificationsOpen(true)}
+              className="relative flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-gray-400 hover:text-gray-700 transition-all cursor-pointer font-medium"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Alerts</span>
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-[#0E7452] text-white text-[9px] font-bold flex items-center justify-center">
+                  {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center space-x-2 py-1 px-3 text-[#0E7452] font-bold text-xs">
+              {currentUser?.role === 'baker' ? <Wheat className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
+              <span>{currentUser?.role === 'baker' ? 'Head Baker Desk' : 'Cashier POS Desk'}</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsNotificationsOpen(true)}
+              className="relative flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-gray-400 hover:text-gray-700 transition-all cursor-pointer font-medium"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Alerts</span>
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-[#0E7452] text-white text-[9px] font-bold flex items-center justify-center">
+                  {notifications.filter(n => !n.read).length > 9 ? '9+' : notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-rose-500 hover:text-rose-600 transition-all cursor-pointer font-medium"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-[10px] mt-0.5 font-bold">Sign Out</span>
+            </button>
+          </>
+        )}
+      </nav>
 
       {/* Standalone Bank Deposit Modal (when triggered from flour alert) */}
       {showDepositModal && (

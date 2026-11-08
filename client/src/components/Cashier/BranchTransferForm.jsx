@@ -625,8 +625,8 @@ export default function BranchTransferForm({
                   No bread varieties added to this delivery trip yet. Select a product above and click "Add to Trip".
                 </div>
               ) : (
-                <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-2xs">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white border border-stone-200 rounded-2xl overflow-x-auto scrollbar-none shadow-2xs">
+                  <table className="w-full min-w-[550px] text-left text-xs">
                     <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                       <tr>
                         <th className="py-2.5 px-3">Bread Product</th>
@@ -785,8 +785,8 @@ export default function BranchTransferForm({
           <span className="text-xs text-stone-500 font-bold">{safeTransfers.length} transfers recorded</span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto scrollbar-none">
+          <table className="w-full min-w-[650px] text-left text-xs">
             <thead className="bg-stone-100/60 text-stone-500 font-bold uppercase text-[10px] border-b border-stone-200">
               <tr>
                 <th className="py-2.5 px-4">Transfer #</th>

@@ -97,17 +97,17 @@ export default function CashierDashboard({
         </div>
       )}
 
-      {/* Cashier Navigation Tabs in Dark Green Theme */}
-      <div className="bg-white rounded-3xl border border-stone-200 p-2.5 shadow-xs">
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      {/* Cashier Navigation Tabs in Dark Green Theme (Swipeable horizontal tabs on mobile) */}
+      <div className="bg-white rounded-3xl border border-stone-200 p-2 sm:p-2.5 shadow-xs">
+        <div className="overflow-x-auto flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2 scrollbar-none pb-1 sm:pb-0">
           {cashierTabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`p-3 rounded-2xl text-center transition-all cursor-pointer relative ${
+              className={`shrink-0 w-36 sm:w-auto p-2.5 sm:p-3 rounded-2xl text-center transition-all cursor-pointer relative ${
                 activeTab === tab.id
-                  ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/25 scale-102 font-black ring-2 ring-emerald-500'
+                  ? 'bg-[#064e3b] text-white shadow-md shadow-emerald-950/25 scale-[1.02] font-black ring-2 ring-emerald-500'
                   : tab.isUrgent
                   ? 'bg-amber-50 text-amber-900 hover:bg-amber-100 font-black border border-amber-300'
                   : 'bg-stone-50 text-stone-700 hover:bg-stone-100 font-bold'

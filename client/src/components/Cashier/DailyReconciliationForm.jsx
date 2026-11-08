@@ -253,8 +253,8 @@ export default function DailyReconciliationForm({
           <span className="text-xs text-stone-500 font-bold">{safeClosings.length} closings recorded</span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto scrollbar-none">
+          <table className="w-full min-w-[620px] text-left text-xs">
             <thead className="bg-stone-100/60 text-stone-500 font-bold uppercase text-[10px] border-b border-stone-200">
               <tr>
                 <th className="py-2.5 px-4">{t('common.date', 'Date')}</th>

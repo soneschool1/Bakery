@@ -39,8 +39,8 @@ export default function ProductionManager({
         </span>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
+      <div className="overflow-x-auto scrollbar-none">
+        <table className="w-full min-w-[750px] text-left text-xs">
           <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
             <tr>
               <th className="py-3 px-4">{t('admin.productionManager.colBatch', 'Batch #')}</th>

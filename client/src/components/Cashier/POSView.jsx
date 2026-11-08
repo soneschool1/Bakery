@@ -12,7 +12,8 @@ import {
   Wheat,
   Printer,
   Check,
-  X
+  X,
+  ArrowRight
 } from 'lucide-react';
 import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n';
@@ -36,6 +37,7 @@ export default function POSView({
   const [saleNotice, setSaleNotice] = useState('');
 
   const cartInputRefs = useRef({});
+  const cartSectionRef = useRef(null);
 
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
   const safeStock = Array.isArray(finishedStock) ? finishedStock : [];
@@ -319,13 +321,13 @@ export default function POSView({
         )}
 
         {/* Category Pills */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-1.5 scrollbar-none -mx-1 px-1">
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                 selectedCategory === cat
                   ? 'bg-emerald-700 text-white shadow-xs scale-102'
                   : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
@@ -337,7 +339,7 @@ export default function POSView({
         </div>
 
         {/* Product Touch Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {availableItems.map((prod) => {
             const isSoldOut = prod.is_sold_out || prod.available_quantity <= 0;
             const icon = prod.category === 'Cookies' ? '🍪' : prod.category === 'Cakes' ? '🎂' : prod.name.includes('Croissant') ? '🥐' : '🥖';
@@ -349,7 +351,7 @@ export default function POSView({
                 type="button"
                 disabled={isSoldOut}
                 onClick={() => handleSelectItem(prod)}
-                className={`p-4 rounded-3xl border-2 text-left transition-all duration-150 flex flex-col justify-between h-40 relative group ${
+                className={`p-3 sm:p-4 rounded-2xl sm:rounded-3xl border-2 text-left transition-all duration-150 flex flex-col justify-between h-36 sm:h-40 relative group ${
                   isSoldOut
                     ? 'bg-stone-100/90 border-stone-200 opacity-60 cursor-not-allowed select-none'
                     : inCart 
@@ -414,7 +416,7 @@ export default function POSView({
       </div>
 
       {/* Right 5 cols: Current Customer Order Section */}
-      <div className="lg:col-span-5 bg-white rounded-3xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between space-y-4">
+      <div ref={cartSectionRef} id="pos-cart-section" className="lg:col-span-5 bg-white rounded-3xl border border-stone-200 p-4 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
         
         <div className="space-y-3">
           
@@ -721,6 +723,33 @@ export default function POSView({
         </div>
 
       </div>
+
+      {/* Mobile Sticky Floating Cart Bar (Appears when cart has items on screens < lg) */}
+      {cart.length > 0 && (
+        <div className="lg:hidden fixed bottom-16 left-3 right-3 z-40 bg-[#064e3b] text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between border border-emerald-500/40 animate-in slide-in-from-bottom-2">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-sm shrink-0">
+              {cart.reduce((sum, item) => sum + item.quantity, 0)}
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-black truncate">{formatETB(chargedTotal)}</div>
+              <div className="text-[10px] text-emerald-200 font-medium truncate">
+                {cart.length} item{cart.length > 1 ? 's' : ''} in cart
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              cartSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="bg-white hover:bg-emerald-50 text-[#064e3b] font-black text-xs px-3.5 py-2 rounded-xl shadow-xs active:scale-95 transition-all cursor-pointer flex items-center space-x-1 shrink-0"
+          >
+            <span>Review Order</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
     </div>
   );

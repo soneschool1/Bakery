@@ -208,7 +208,7 @@ export default function AdminDashboard({
       {/* 1. HERO ROW: "Welcome Back, Sujon" style with date picker & action button */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-1">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             {t('admin.welcomeBack', 'Welcome Back, {name}').replace('{name}', '')} <span className="text-[#0E7452]">{adminName}</span>
           </h1>
           <p className="text-xs text-gray-500 font-medium mt-0.5">
@@ -217,15 +217,15 @@ export default function AdminDashboard({
         </div>
 
         {/* Date Selector Pill & Action Button */}
-        <div className="flex items-center flex-wrap gap-2.5">
+        <div className="flex items-center flex-wrap gap-2 sm:gap-2.5 max-w-full">
           {/* Pill Date Range Filter */}
-          <div className="flex items-center bg-white border border-gray-200/90 shadow-[0_2px_10px_rgba(0,0,0,0.02)] p-1 rounded-full text-xs font-semibold">
+          <div className="overflow-x-auto max-w-full scrollbar-none flex items-center bg-white border border-gray-200/90 shadow-[0_2px_10px_rgba(0,0,0,0.02)] p-1 rounded-full text-xs font-semibold">
             {ranges.map((r) => (
               <button
                 key={r.id}
                 type="button"
                 onClick={() => setDateRange(r.id)}
-                className={`px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   dateRange === r.id
                     ? 'bg-[#0E7452] text-white shadow-xs'
                     : 'text-gray-500 hover:text-gray-900'
