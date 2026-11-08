@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -81,6 +82,9 @@ func SSEHandler(c *gin.Context) {
 				return true
 			}
 			fmt.Fprintf(w, "event: %s\ndata: %s\n\n", evt.Type, string(bytes))
+			return true
+		case <-time.After(15 * time.Second):
+			fmt.Fprintf(w, ": keepalive\n\n")
 			return true
 		case <-c.Request.Context().Done():
 			return false

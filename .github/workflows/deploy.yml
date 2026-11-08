@@ -1,43 +1,39 @@
 name: Harbuu Bakery Deployment Pipeline
 
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment Environment'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
-          - staging
+
+concurrency:
+  group: production_deployment
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Deploy to Environment
+    name: Deploy to Hostinger VPS
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'production' }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deployment Notice
-        run: |
-          echo "========================================="
-          echo "🚀 Deploying Harbuu Bakery to ${{ github.event.inputs.environment || 'production' }}..."
-          echo "========================================="
-
-      # Optional SSH Deployment Step (uncomment and add secrets in GitHub Repo Settings -> Secrets)
-      # - name: Deploy via SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd /var/www/harbuu-bakery
-      #       git pull origin main
-      #       npm --prefix client ci && npm --prefix client run build
-      #       cd backend && go build -o server main.go
-      #       systemctl restart harbuu-backend
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            echo "========================================="
+            echo "🚀 Starting Harbuu Bakery Deployment..."
+            echo "========================================="
+            cd /opt/bakery
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up -d --build --remove-orphans
+            docker compose ps
+            echo "========================================="
+            echo "✅ Deployment successful and verified!"
+            echo "========================================="

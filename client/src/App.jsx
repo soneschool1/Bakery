@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from './components/Navbar';
 import FlourAlertBanner from './components/FlourAlertBanner';
 import NotificationDrawer from './components/NotificationDrawer';
@@ -165,6 +165,11 @@ export default function App() {
     loadDashboard();
   }, [dateRange, loadDashboard]);
 
+  const loadAllDataRef = useRef(loadAllData);
+  useEffect(() => {
+    loadAllDataRef.current = loadAllData;
+  }, [loadAllData]);
+
   // Real-time Server-Sent Events setup
   useEffect(() => {
     const cleanup = setupSSE((event) => {
@@ -172,11 +177,13 @@ export default function App() {
         setSseConnected(event.connected);
       } else {
         // Any data change triggers seamless refresh
-        loadAllData();
+        if (loadAllDataRef.current) {
+          loadAllDataRef.current();
+        }
       }
     });
     return cleanup;
-  }, [loadAllData]);
+  }, []);
 
   // Authentication handlers
   function handleLoginSuccess(user) {

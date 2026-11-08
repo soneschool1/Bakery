@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -176,6 +176,11 @@ export default function AdminDashboard({
     fetchOperationalFlow();
   }, [dashboardData, fetchOperationalFlow]);
 
+  const fetchOperationalFlowRef = useRef(fetchOperationalFlow);
+  useEffect(() => {
+    fetchOperationalFlowRef.current = fetchOperationalFlow;
+  }, [fetchOperationalFlow]);
+
   // Real-time SSE listener to immediately update Payment History whenever ANY transaction occurs
   useEffect(() => {
     const cleanup = setupSSE((event) => {
@@ -189,11 +194,13 @@ export default function AdminDashboard({
         event?.type === 'deposit_created' ||
         event?.type === 'fixed_expense_payment_updated'
       ) {
-        fetchOperationalFlow();
+        if (fetchOperationalFlowRef.current) {
+          fetchOperationalFlowRef.current();
+        }
       }
     });
     return cleanup;
-  }, [fetchOperationalFlow]);
+  }, []);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
