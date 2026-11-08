@@ -809,18 +809,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-4 text-center text-xs text-gray-400 no-print">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-gray-800">{t('common.footerBrand', 'Harbuu Bakery Management System')}</span>
-            <span>• {t('common.footerRegion', 'Ethiopia (ETB)')}</span>
-          </div>
-          <div>
-            {t('common.footerTech', 'Built with React, Go (Golang), and MongoDB')}
-          </div>
-        </div>
-      </footer>
+
 
     </div>
   );

@@ -166,10 +166,7 @@ export default function LoginPage({ onLoginSuccess }) {
 
       </div>
 
-      {/* Footer Branding */}
-      <div className="mt-6 text-center text-xs text-gray-400">
-        Harbuu Bakery Management System • Ethiopia (ETB)
-      </div>
+
 
     </div>
   );
