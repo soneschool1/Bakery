@@ -68,7 +68,8 @@ export default function AdminPanel({
   onDeleteSuggestion, 
   onAddUser, 
   onUpdateUser, 
-  onDeleteUser 
+  onDeleteUser,
+  onSwitchRole
 }) {
   const { t } = useTranslation();
   // Primary Sections: 'dashboard', 'daily_sales', 'stock_control', 'expenses', 'products', 'reports', 'settings_staff'
@@ -314,29 +315,42 @@ export default function AdminPanel({
         {activeSection === 'products' && (
           <div className="space-y-4">
             {/* Segmented Sub-Tab Switcher in Harbuu Green */}
-            <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-1 rounded-2xl w-fit shadow-xs">
-              <button
-                type="button"
-                onClick={() => setProductSubTab('products')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  productSubTab === 'products' 
-                    ? 'bg-[#0E7452] text-white shadow-xs' 
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {t('admin.breadTypesSubTab', '🍞 Bread Types & Selling Prices')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setProductSubTab('batches')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  productSubTab === 'batches' 
-                    ? 'bg-[#0E7452] text-white shadow-xs' 
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {t('admin.allBatchesSubTab', '🥖 All Production Batches')}
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center space-x-1.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-1 rounded-2xl w-fit shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setProductSubTab('products')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    productSubTab === 'products' 
+                      ? 'bg-[#0E7452] text-white shadow-xs' 
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t('admin.breadTypesSubTab', '🍞 Bread Types & Selling Prices')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductSubTab('batches')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    productSubTab === 'batches' 
+                      ? 'bg-[#0E7452] text-white shadow-xs' 
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {t('admin.allBatchesSubTab', '🥖 All Production Batches')}
+                </button>
+              </div>
+
+              {onSwitchRole && (
+                <button
+                  type="button"
+                  onClick={() => onSwitchRole('baker')}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-emerald-50 hover:bg-emerald-100 text-[#0E7452] border border-[#0E7452]/30 shadow-2xs transition-all cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Wheat className="w-3.5 h-3.5" />
+                  <span>🥖 Open Live Baker Production Desk</span>
+                </button>
+              )}
             </div>
 
             {productSubTab === 'products' && (

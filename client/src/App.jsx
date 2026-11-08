@@ -717,6 +717,14 @@ export default function App() {
             onAddUser={handleAddUser}
             onUpdateUser={handleUpdateUser}
             onDeleteUser={handleDeleteUser}
+            onSwitchRole={(role) => {
+              const target = allUsers.find(u => u.role === role) || {
+                role,
+                full_name: role === 'baker' ? 'Dawit Alemu (Head Baker)' : 'Tigist Haile (Cashier)',
+                username: role,
+              };
+              setCurrentUser(target);
+            }}
           />
         )}
 

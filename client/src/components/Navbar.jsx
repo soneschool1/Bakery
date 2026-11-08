@@ -72,7 +72,23 @@ export default function Navbar({
     : 'HB';
 
   return (
-    <header className="sticky top-0 z-40 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 sm:px-6 lg:px-8 shadow-xs">
+    <>
+      {isImpersonating && (
+        <div className="bg-amber-600 text-white px-4 sm:px-8 py-2 text-xs font-black flex items-center justify-between shadow-xs sticky top-0 z-50">
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-amber-200 shrink-0" />
+            <span>Admin Inspection: Currently testing <strong>{currentUser?.role === 'baker' ? '🥖 Baker Production Desk' : '🏪 Cashier POS Desk'}</strong></span>
+          </div>
+          <button
+            type="button"
+            onClick={returnToAdmin}
+            className="bg-white text-amber-900 px-3 py-1 rounded-xl text-xs font-black hover:bg-amber-50 cursor-pointer shadow-xs transition-transform active:scale-95 shrink-0"
+          >
+            ← Return to Admin Portal
+          </button>
+        </div>
+      )}
+      <header className="sticky top-0 z-40 h-16 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 sm:px-6 lg:px-8 shadow-xs">
       <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
         
         {/* Brand Logo & SINO Badges */}
@@ -230,6 +246,45 @@ export default function Navbar({
                   )}
                 </div>
 
+                {/* Workspace Switcher inside Menu */}
+                {isAdmin && (
+                  <div className="py-2 border-b border-slate-100 dark:border-slate-800 space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider block">
+                      Switch Workplace Desk:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => { switchRole('admin'); setIsProfileMenuOpen(false); }}
+                      className={`w-full text-left px-2.5 py-1.5 text-xs font-bold rounded-xl transition-colors flex items-center space-x-2 cursor-pointer ${
+                        currentUser?.role === 'admin' ? 'bg-[#0E7452] text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Admin Management</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { switchRole('baker'); setIsProfileMenuOpen(false); }}
+                      className={`w-full text-left px-2.5 py-1.5 text-xs font-bold rounded-xl transition-colors flex items-center space-x-2 cursor-pointer ${
+                        currentUser?.role === 'baker' ? 'bg-[#0E7452] text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <Wheat className="w-3.5 h-3.5" />
+                      <span>🥖 Head Baker Desk</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { switchRole('cashier'); setIsProfileMenuOpen(false); }}
+                      className={`w-full text-left px-2.5 py-1.5 text-xs font-bold rounded-xl transition-colors flex items-center space-x-2 cursor-pointer ${
+                        currentUser?.role === 'cashier' ? 'bg-[#0E7452] text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                      }`}
+                    >
+                      <Store className="w-3.5 h-3.5" />
+                      <span>🏪 Cashier POS Desk</span>
+                    </button>
+                  </div>
+                )}
+
                 {/* If Admin is impersonating, option to return */}
                 {isImpersonating && (
                   <button
@@ -265,5 +320,6 @@ export default function Navbar({
 
       </div>
     </header>
+  </>
   );
 }
