@@ -591,10 +591,10 @@ export default function BakerDashboard({
   }, [batches, historyFilter, todayStr]);
 
   const stepTitles = [
-    { num: 1, title: 'Category', subtitle: cookingCategory, icon: Wheat },
-    { num: 2, title: 'Ingredients', subtitle: `${flourKg}kg flour (~${estimatedDoughTotalKg}kg dough)`, icon: Scale },
-    { num: 3, title: 'Varieties & Weights', subtitle: `${selectedBreads.length} varieties (${totalPieces} pcs)`, icon: Layers },
-    { num: 4, title: 'Bake & Send', subtitle: `${totalPieces} pcs (${totalDoughRequiredKg} kg)`, icon: CheckCircle2 },
+    { num: 1, title: t('baker.step1Short', 'Category'), subtitle: cookingCategory, icon: Wheat },
+    { num: 2, title: t('baker.step2Short', 'Ingredients'), subtitle: `${flourKg}kg ${t('common.kg', 'kg')} (~${estimatedDoughTotalKg}kg)`, icon: Scale },
+    { num: 3, title: t('baker.step3Short', 'Varieties & Weights'), subtitle: `${selectedBreads.length} ${selectedBreads.length === 1 ? t('baker.varietyCountSingle', '1 Variety') : t('baker.varietiesCount', '${count} Varieties').replace('${count}', selectedBreads.length)} (${totalPieces} ${t('common.pieces', 'pcs')})`, icon: Layers },
+    { num: 4, title: t('baker.step4Short', 'Bake & Send'), subtitle: `${totalPieces} ${t('common.pieces', 'pcs')} (${totalDoughRequiredKg} ${t('common.kg', 'kg')})`, icon: CheckCircle2 },
   ];
 
   return (
@@ -613,7 +613,7 @@ export default function BakerDashboard({
             }`}
           >
             <Wheat className="w-4 h-4 text-emerald-300" />
-            <span>🥖 Start Baking</span>
+            <span>🥖 {t('baker.startBakingTab', 'Start Baking')}</span>
           </button>
 
           <button
@@ -626,7 +626,7 @@ export default function BakerDashboard({
             }`}
           >
             <History className="w-4 h-4 text-emerald-300" />
-            <span>📜 History ({todayBatches.length})</span>
+            <span>📜 {t('baker.historyTab', 'History')} ({todayBatches.length})</span>
           </button>
 
           <button
@@ -639,12 +639,12 @@ export default function BakerDashboard({
             }`}
           >
             <Package className="w-4 h-4 text-emerald-300" />
-            <span>📦 Store Stock ({rawMaterials.length})</span>
+            <span>📦 {t('baker.storeStockTab', 'Store Stock')} ({rawMaterials.length})</span>
           </button>
         </div>
 
         <div className="flex items-center space-x-2 text-xs font-bold text-stone-600 pr-2">
-          <span>Head Baker: <strong className="text-stone-900">{baker?.full_name || 'Dawit Alemu'}</strong></span>
+          <span>{t('baker.headBakerLabel', 'Head Baker')}: <strong className="text-stone-900">{baker?.full_name || 'Dawit Alemu'}</strong></span>
         </div>
       </div>
 
@@ -654,7 +654,7 @@ export default function BakerDashboard({
           <div className="flex items-start sm:items-center space-x-3">
             <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 sm:mt-0" />
             <div>
-              <p className="font-black text-xs sm:text-sm">⚠️ LOW STOCK ALERT IN BAKERY STORE:</p>
+              <p className="font-black text-xs sm:text-sm">⚠️ {t('baker.lowStockBannerTitle', 'LOW STOCK ALERT IN BAKERY STORE:')}</p>
               <p className="text-xs font-semibold text-rose-800 break-words">
                 {lowStockMaterials.map(m => `${m.name} (${m.current_quantity} ${m.unit} left, min: ${m.minimum_stock})`).join(' • ')}
               </p>
@@ -665,7 +665,7 @@ export default function BakerDashboard({
             onClick={() => setBakerTab('stock')}
             className="text-xs font-black bg-rose-600 text-white px-3.5 py-2 rounded-xl hover:bg-rose-700 cursor-pointer shrink-0 self-start sm:self-auto"
           >
-            View Stock
+            {t('baker.viewStockBtn', 'View Stock')}
           </button>
         </div>
       )}
@@ -714,7 +714,7 @@ export default function BakerDashboard({
                   {activeStep}
                 </span>
                 <span className="text-sm font-extrabold text-stone-900">
-                  Step {activeStep} of 4: {stepTitles[activeStep - 1]?.title}
+                  {t('baker.stepOf', 'Step {step} of 4: {title}').replace('{step}', activeStep).replace('{title}', stepTitles[activeStep - 1]?.title)}
                 </span>
                 <span className="text-xs font-bold text-stone-500">
                   ({stepTitles[activeStep - 1]?.subtitle})
@@ -730,7 +730,7 @@ export default function BakerDashboard({
                     viewMode === 'wizard' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-900'
                   }`}
                 >
-                  Step-by-Step (Wizard)
+                  {t('baker.viewWizard', 'Step-by-Step (Wizard)')}
                 </button>
                 <button
                   type="button"
@@ -739,7 +739,7 @@ export default function BakerDashboard({
                     viewMode === 'scroll' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-900'
                   }`}
                 >
-                  All Steps (Single Page)
+                  {t('baker.viewAllSteps', 'All Steps (Single Page)')}
                 </button>
               </div>
             </div>
@@ -807,24 +807,24 @@ export default function BakerDashboard({
                     <span className="w-8 h-8 rounded-full bg-[#064e3b] text-white inline-flex items-center justify-center text-sm font-black shadow-xs">
                       1
                     </span>
-                    <span>Choose What You Are Cooking:</span>
+                    <span>{t('baker.step1Heading', 'Choose What You Are Cooking:')}</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Select product family — automatically advances to Step 2
+                    {t('baker.step1Subheading', 'Select product family — automatically advances to Step 2')}
                   </p>
                 </div>
                 <span className="hidden sm:inline-block text-xs font-bold bg-emerald-50 text-[#064e3b] px-3 py-1 rounded-full border border-emerald-200">
-                  ⚡ 1-Click Auto-Advance
+                  {t('baker.oneClickAdvance', '⚡ 1-Click Auto-Advance')}
                 </span>
               </div>
 
               {/* Big Category Buttons */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { id: 'Bread', label: 'Bread', icon: '🥖', desc: 'Table bread, special, family loaf' },
-                  { id: 'Cookies', label: 'Tea Cookies', icon: '🍪', desc: 'Selit, Tekur azmud cookies' },
-                  { id: 'Cake', label: 'Cake', icon: '🎂', desc: 'Celebration cakes & slices' },
-                  { id: 'Other Products', label: 'Other Products', icon: '🥐', desc: 'Croissants & pastries' },
+                  { id: 'Bread', label: t('baker.breadCat', 'Bread'), icon: '🥖', desc: t('baker.breadDesc', 'Table bread, special, family loaf') },
+                  { id: 'Cookies', label: t('baker.cookiesCat', 'Tea Cookies'), icon: '🍪', desc: t('baker.cookiesDesc', 'Selit, Tekur azmud cookies') },
+                  { id: 'Cake', label: t('baker.cakeCat', 'Cake'), icon: '🎂', desc: t('baker.cakeDesc', 'Celebration cakes & slices') },
+                  { id: 'Other Products', label: t('baker.otherCat', 'Other Products'), icon: '🥐', desc: t('baker.otherDesc', 'Croissants & pastries') },
                 ].map((cat) => {
                   const isSelected = isSameCategory(cookingCategory, cat.id);
                   const isAnimating = animatingCategory === cat.id;
@@ -862,7 +862,7 @@ export default function BakerDashboard({
                       {isAnimating && (
                         <div className="absolute inset-x-0 bottom-0 bg-[#064e3b] text-white text-[11px] font-black py-1 px-2 text-center flex items-center justify-center space-x-1.5 animate-pulse">
                           <Sparkles className="w-3 h-3 text-emerald-300 animate-spin" />
-                          <span>Advancing to Step 2...</span>
+                          <span>{t('baker.advancingToStep2', 'Advancing to Step 2...')}</span>
                         </div>
                       )}
                     </button>
@@ -873,14 +873,14 @@ export default function BakerDashboard({
               {/* Step 1 Footer Action */}
               <div className="pt-2 flex items-center justify-between border-t border-stone-100">
                 <span className="text-xs font-bold text-stone-500">
-                  Selected Category: <strong className="text-stone-900">{cookingCategory}</strong>
+                  {t('baker.selectedCatLabel', 'Selected Category:')} <strong className="text-stone-900">{cookingCategory}</strong>
                 </span>
                 <button
                   type="button"
                   onClick={() => jumpToStep(2)}
                   className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Enter Mixer Ingredients</span>
+                  <span>{t('baker.nextMixerBtn', 'Next: Enter Mixer Ingredients')}</span>
                   <ArrowRight className="w-4 h-4 text-emerald-300" />
                 </button>
               </div>
@@ -901,15 +901,15 @@ export default function BakerDashboard({
                     <span className="w-8 h-8 rounded-full bg-[#064e3b] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       2
                     </span>
-                    <span>Enter Ingredients Used for This Batch:</span>
+                    <span>{t('baker.step2Heading', 'Enter Ingredients Used for This Batch:')}</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Measure and enter exact ingredient weights used in the mixer for this batch
+                    {t('baker.step2Subheading', 'Measure and enter exact ingredient weights used in the mixer for this batch')}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2 text-xs font-bold bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200 self-start sm:self-auto">
                   <Package className="w-4 h-4 text-[#064e3b]" />
-                  <span>Category: <strong>{cookingCategory}</strong></span>
+                  <span>{t('baker.colCategory', 'Category')}: <strong>{cookingCategory}</strong></span>
                 </div>
               </div>
 
@@ -923,7 +923,7 @@ export default function BakerDashboard({
                   return (
                     <div className={`p-4 rounded-2xl border transition-all ${isLow ? 'bg-rose-50/70 border-rose-300' : 'bg-emerald-50/50 border-emerald-200'}`}>
                       <label className="block text-xs font-black text-emerald-950 uppercase mb-1 flex items-center justify-between">
-                        <span>🌾 Flour (kilo) *</span>
+                        <span>{t('baker.flourKg', '🌾 Flour (kilo) *')}</span>
                         {isLow && <span className="text-[9px] bg-rose-200 text-rose-800 px-1 rounded-sm animate-pulse">Low</span>}
                       </label>
                       <input
@@ -935,7 +935,7 @@ export default function BakerDashboard({
                         placeholder="e.g. 35"
                       />
                       <div className="mt-1 flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-stone-500">In store:</span>
+                        <span className="text-stone-500">{t('baker.inStore', 'In store:')}</span>
                         <span className={isLow ? 'text-rose-700 font-black' : 'text-emerald-900 font-extrabold'}>
                           {flourStock} kg
                         </span>
@@ -951,7 +951,7 @@ export default function BakerDashboard({
                   return (
                     <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                       <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                        🧪 Maj mix (grams)
+                        🧪 {t('baker.majMixGrams', 'Maj mix (grams)')}
                       </label>
                       <input
                         type="number"
@@ -975,7 +975,7 @@ export default function BakerDashboard({
                   return (
                     <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                       <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                        🍞 Yeast (grams)
+                        🍞 {t('baker.yeastGrams', 'Yeast (grams)')}
                       </label>
                       <input
                         type="number"
@@ -999,7 +999,7 @@ export default function BakerDashboard({
                   return (
                     <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                       <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                        🧂 Salt (grams)
+                        🧂 {t('baker.saltGrams', 'Salt (grams)')}
                       </label>
                       <input
                         type="number"
@@ -1023,7 +1023,7 @@ export default function BakerDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-stone-100">
                   <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                     <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                      🍬 Sugar (grams)
+                      🍬 {t('baker.sugarGrams', 'Sugar (grams)')}
                     </label>
                     <input
                       type="number"
@@ -1036,7 +1036,7 @@ export default function BakerDashboard({
 
                   <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                     <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                      🌱 Selit (grams)
+                      🌱 {t('baker.selitGrams', 'Selit (grams)')}
                     </label>
                     <input
                       type="number"
@@ -1049,7 +1049,7 @@ export default function BakerDashboard({
 
                   <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
                     <label className="block text-xs font-black text-stone-800 uppercase mb-1">
-                      🌿 Tekur azmud (grams)
+                      🌿 {t('baker.tekurAzmudGrams', 'Tekur azmud (grams)')}
                     </label>
                     <input
                       type="number"
@@ -1068,7 +1068,7 @@ export default function BakerDashboard({
                   <div className="flex items-center space-x-2">
                     <Scale className="w-5 h-5 text-[#064e3b]" />
                     <span className="text-sm font-black text-emerald-950">
-                      Combined Dough Estimation & Batch Yield Balance
+                      {t('baker.batchDoughEstimation', 'Combined Dough Estimation & Batch Yield Balance')}
                     </span>
                   </div>
                   <div className="text-xs font-bold text-stone-500">
@@ -1078,7 +1078,7 @@ export default function BakerDashboard({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
-                    <span className="text-stone-500 font-bold block">Estimated Mixer Dough Yield:</span>
+                    <span className="text-stone-500 font-bold block">{t('baker.mixerDoughYield', 'Estimated Mixer Dough Yield:')}</span>
                     <span className="text-2xl font-black text-[#064e3b] block mt-0.5">
                       ~{estimatedDoughTotalKg} kg
                     </span>
@@ -1088,7 +1088,7 @@ export default function BakerDashboard({
                   </div>
 
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
-                    <span className="text-stone-500 font-bold block">Planned Bread Dough Needed:</span>
+                    <span className="text-stone-500 font-bold block">{t('baker.totalDoughNeeded', 'Planned Bread Dough Needed:')}</span>
                     <span className="text-2xl font-black text-stone-900 block mt-0.5">
                       {totalDoughRequiredKg} kg
                     </span>
@@ -1099,7 +1099,7 @@ export default function BakerDashboard({
 
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs flex flex-col justify-between">
                     <div>
-                      <span className="text-stone-500 font-bold block">Batch Balance Status:</span>
+                      <span className="text-stone-500 font-bold block">{t('baker.batchBalanceStatus', 'Batch Balance Status:')}</span>
                       <span className={`inline-flex items-center space-x-1 font-black text-xs px-2.5 py-1 rounded-lg mt-1 ${
                         Number(doughDifferenceKg) >= 0 
                           ? 'bg-emerald-100 text-emerald-900' 
@@ -1126,14 +1126,14 @@ export default function BakerDashboard({
                   className="text-stone-600 hover:text-stone-900 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-stone-100 transition-all flex items-center space-x-1.5 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Categories</span>
+                  <span>{t('baker.backToCategories', 'Back to Categories')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => jumpToStep(3)}
                   className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Select Varieties & Set Dough Weights</span>
+                  <span>{t('baker.nextVarietiesBtn', 'Next: Select Varieties & Set Dough Weights')}</span>
                   <ArrowRight className="w-4 h-4 text-emerald-300" />
                 </button>
               </div>
@@ -1154,10 +1154,10 @@ export default function BakerDashboard({
                     <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       3
                     </span>
-                    <span>Select Varieties & Set Dough Weight / Quantities:</span>
+                    <span>{t('baker.step3Heading', 'Select Varieties & Set Dough Weight / Quantities:')}</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Select bread varieties to bake together and adjust portion weights and quantities for each variety
+                    {t('baker.step3Subheading', 'Select bread varieties to bake together and adjust portion weights and quantities for each variety')}
                   </p>
                 </div>
                 
@@ -1167,11 +1167,11 @@ export default function BakerDashboard({
                     onClick={handleSelectAllBreads}
                     className="text-xs font-black text-[#0E7452] hover:text-[#064e3b] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
                   >
-                    Select All
+                    {t('baker.selectAll', 'Select All')}
                   </button>
                   <span className="text-xs font-black text-[#0E7452] bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5">
                     <Package className="w-4 h-4" />
-                    <span>{selectedBreads.length} {selectedBreads.length === 1 ? 'Variety' : 'Varieties'}</span>
+                    <span>{selectedBreads.length === 1 ? t('baker.varietyCountSingle', '1 Variety') : t('baker.varietiesCount', '{count} Varieties').replace('{count}', selectedBreads.length)}</span>
                   </span>
                 </div>
               </div>
@@ -1181,10 +1181,10 @@ export default function BakerDashboard({
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-stone-800 uppercase tracking-wider flex items-center space-x-1.5">
                     <Wheat className="w-4 h-4 text-[#0E7452]" />
-                    <span>1. Choose Varieties of {cookingCategory}:</span>
+                    <span>{t('baker.chooseVarietiesHeading', '1. Choose Varieties of {category}:').replace('{category}', cookingCategory)}</span>
                   </span>
                   <span className="text-[11px] font-bold text-stone-500">
-                    Tap to add or remove varieties from batch
+                    {t('baker.tapToAddRemove', 'Tap to add or remove varieties from batch')}
                   </span>
                 </div>
 
@@ -1212,7 +1212,7 @@ export default function BakerDashboard({
                                 {p.name}
                               </span>
                               <div className="flex items-center space-x-2 text-xs font-bold text-stone-500 mt-0.5">
-                                <span>Standard: {p.weight_grams || 100}g</span>
+                                <span>{t('baker.standardWeight', 'Standard: {weight}g').replace('{weight}', p.weight_grams || 100)}</span>
                               </div>
                             </div>
 
@@ -1237,10 +1237,10 @@ export default function BakerDashboard({
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-black text-stone-800 uppercase tracking-wider flex items-center space-x-1.5">
                     <Scale className="w-4 h-4 text-[#0E7452]" />
-                    <span>2. Dough Weight & Pieces for Each Variety ({selectedBreads.length}):</span>
+                    <span>{t('baker.doughWeightHeading', '2. Dough Weight & Pieces for Each Variety ({count}):').replace('{count}', selectedBreads.length)}</span>
                   </span>
                   <span className="text-[11px] font-bold text-[#0E7452]">
-                    Total Output: {totalPieces} pcs (~{totalDoughRequiredKg} kg)
+                    {t('baker.totalOutputLive', 'Total Output: {pieces} pcs (~{kg} kg)').replace('{pieces}', totalPieces).replace('{kg}', totalDoughRequiredKg)}
                   </span>
                 </div>
 
@@ -1279,7 +1279,7 @@ export default function BakerDashboard({
                           <div className="flex items-center space-x-3 self-end sm:self-auto">
                             {/* Variety subtotal preview badge */}
                             <div className="text-right text-xs bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
-                              <span className="text-stone-400 font-bold block text-[10px] uppercase">Batch Dough</span>
+                              <span className="text-stone-400 font-bold block text-[10px] uppercase">{t('baker.batchDoughLabel', 'Batch Dough')}</span>
                               <span className="font-black text-[#0E7452]">
                                 {breadTotalKg} kg
                               </span>
@@ -1306,10 +1306,10 @@ export default function BakerDashboard({
                             <div className="flex items-center justify-between">
                               <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
                                 <Scale className="w-3.5 h-3.5 text-[#0E7452]" />
-                                <span>Portion Weight (Grams):</span>
+                                <span>{t('baker.portionWeightGrams', 'Portion Weight (Grams):')}</span>
                               </label>
                               <span className="text-[11px] font-bold text-stone-500">
-                                Target per piece
+                                {t('baker.targetPerPiece', 'Target per piece')}
                               </span>
                             </div>
 
@@ -1366,10 +1366,10 @@ export default function BakerDashboard({
                             <div className="flex items-center justify-between">
                               <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
                                 <Package className="w-3.5 h-3.5 text-[#0E7452]" />
-                                <span>Pieces Baked for {bread.name}:</span>
+                                <span>{t('baker.piecesBakedFor', 'Pieces Baked for {name}:').replace('{name}', bread.name)}</span>
                               </label>
                               <span className="text-[11px] font-bold text-stone-500">
-                                Units produced
+                                {t('baker.unitsProduced', 'Units produced')}
                               </span>
                             </div>
 
@@ -1433,24 +1433,24 @@ export default function BakerDashboard({
                 <div className="flex items-center justify-between text-xs font-black text-emerald-950 uppercase tracking-wider">
                   <span className="flex items-center space-x-2">
                     <Layers className="w-4 h-4 text-[#0E7452]" />
-                    <span>Combined Batch Totals ({selectedBreads.length} Varieties)</span>
+                    <span>{t('baker.combinedBatchTotals', 'Combined Batch Totals ({count} Varieties)').replace('{count}', selectedBreads.length)}</span>
                   </span>
                   <span className="text-[11px] font-bold text-emerald-800">
-                    Live Combined Output
+                    {t('baker.liveCombinedOutput', 'Live Combined Output')}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
-                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Pieces</span>
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">{t('baker.totalPiecesLabel', 'Total Pieces')}</span>
                     <span className="text-2xl font-black text-[#0E7452] block mt-0.5">{totalPieces} pcs</span>
                   </div>
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
-                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Dough Needed</span>
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">{t('baker.totalDoughNeeded', 'Total Dough Needed')}</span>
                     <span className="text-2xl font-black text-stone-900 block mt-0.5">{totalDoughRequiredKg} kg</span>
                   </div>
                   <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
-                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Mixer Dough Yield</span>
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">{t('baker.mixerDoughYield', 'Mixer Dough Yield')}</span>
                     <span className="text-2xl font-black text-emerald-800 block mt-0.5">~{estimatedDoughTotalKg} kg</span>
                   </div>
                 </div>
@@ -1458,7 +1458,7 @@ export default function BakerDashboard({
                 {/* Dough buffer indicator */}
                 <div className="flex items-center justify-between text-xs pt-1 px-1">
                   <span className="text-stone-500 font-medium">
-                    Mixer Dough vs Total Bread Portions:
+                    {t('baker.mixerVsPortions', 'Mixer Dough vs Total Bread Portions:')}
                   </span>
                   <span className={`font-black px-2.5 py-0.5 rounded-lg ${
                     Number(doughDifferenceKg) >= 0 
@@ -1480,14 +1480,14 @@ export default function BakerDashboard({
                   className="text-stone-600 hover:text-stone-900 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-stone-100 transition-all flex items-center space-x-1.5 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Ingredients</span>
+                  <span>{t('baker.backToIngredients', 'Back to Ingredients')}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => jumpToStep(4)}
                   className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Review & Complete Baking ({totalPieces} pcs)</span>
+                  <span>{t('baker.nextReviewBtn', 'Next: Review & Complete Baking ({pieces} pcs)').replace('{pieces}', totalPieces)}</span>
                   <ArrowRight className="w-4 h-4 text-emerald-200" />
                 </button>
               </div>
@@ -1508,15 +1508,15 @@ export default function BakerDashboard({
                     <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       4
                     </span>
-                    <span>Review & Transfer Finished Stock to Cashier:</span>
+                    <span>{t('baker.step4Heading', 'Review & Transfer Finished Stock to Cashier:')}</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Verify all varieties in this batch. Stock will be immediately credited to cashiers upon completion.
+                    {t('baker.step4Subheading', 'Verify all varieties in this batch. Stock will be immediately credited to cashiers upon completion.')}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2 self-start sm:self-auto">
                   <span className="text-xs font-black text-[#064e3b] bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
-                    {totalPieces} Pieces Total
+                    {totalPieces} {t('baker.piecesTotal', 'Pieces Total')}
                   </span>
                 </div>
               </div>
@@ -1524,8 +1524,8 @@ export default function BakerDashboard({
               {/* Itemized Batch Manifest Table */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs font-black text-stone-700 uppercase">
-                  <span>Itemized Batch Output Manifest ({selectedBreads.length} Varieties)</span>
-                  <span className="text-emerald-700 font-bold">Auto-Deposited to Cashier</span>
+                  <span>{t('baker.manifestHeading', 'Itemized Batch Output Manifest ({count} Varieties)').replace('{count}', selectedBreads.length)}</span>
+                  <span className="text-emerald-700 font-bold">{t('baker.autoDepositedNotice', 'Auto-Deposited to Cashier')}</span>
                 </div>
 
                 <div className="overflow-x-auto border border-stone-200 rounded-2xl">
@@ -1533,11 +1533,11 @@ export default function BakerDashboard({
                     <thead className="bg-stone-50 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                       <tr>
                         <th className="py-3 px-4">#</th>
-                        <th className="py-3 px-4">Bread Variety</th>
-                        <th className="py-3 px-4">Category</th>
-                        <th className="py-3 px-4 text-center">Portion</th>
-                        <th className="py-3 px-4 text-center">Pieces Baked</th>
-                        <th className="py-3 px-4 text-right">Batch Dough Weight</th>
+                        <th className="py-3 px-4">{t('baker.colBreadVariety', 'Bread Variety')}</th>
+                        <th className="py-3 px-4">{t('baker.colCategory', 'Category')}</th>
+                        <th className="py-3 px-4 text-center">{t('baker.colPortion', 'Portion')}</th>
+                        <th className="py-3 px-4 text-center">{t('baker.colPiecesBaked', 'Pieces Baked')}</th>
+                        <th className="py-3 px-4 text-right">{t('baker.colBatchDoughWeight', 'Batch Dough Weight')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100 font-medium">
@@ -1571,7 +1571,7 @@ export default function BakerDashboard({
               {/* Consumed Ingredients Recap Pill Box */}
               <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-2">
                 <span className="text-[11px] font-black text-stone-500 uppercase tracking-wider block">
-                  Mixer Ingredients Consumed in This Batch:
+                  {t('baker.ingredientsConsumedMixer', 'Mixer Ingredients Consumed in This Batch:')}
                 </span>
                 <div className="flex flex-wrap gap-2 text-xs font-bold text-stone-800">
                   <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">
@@ -1606,8 +1606,8 @@ export default function BakerDashboard({
                 <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-200 shrink-0" />
                 <span className="truncate">
                   {isSubmitting 
-                    ? 'Recording Batch & Stock...' 
-                    : `🥖 COMPLETE BAKING & TRANSFER ${totalPieces} PCS TO CASHIER`}
+                    ? t('baker.savingBatch', 'Recording Batch & Stock...') 
+                    : t('baker.bakeAndTransferBtn', '🥖 COMPLETE BAKING & TRANSFER {pieces} PCS TO CASHIER').replace('{pieces}', totalPieces)}
                 </span>
               </button>
 
@@ -1619,7 +1619,7 @@ export default function BakerDashboard({
                   className="text-stone-500 hover:text-stone-900 text-xs font-black inline-flex items-center space-x-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Varieties & Weights</span>
+                  <span>{t('baker.backToEditVarieties', 'Back to Varieties & Weights')}</span>
                 </button>
               </div>
             </div>
@@ -1631,10 +1631,10 @@ export default function BakerDashboard({
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                 <span className="text-xs font-extrabold text-amber-950">
-                  ⚡ 1-Tap Quick Recipe Presets (Autofill Entire Batch):
+                  {t('baker.presetsTitle', '⚡ 1-Tap Quick Recipe Presets (Autofill Entire Batch):')}
                 </span>
               </div>
-              <span className="text-[11px] font-bold text-amber-800">Tap to load preset</span>
+              <span className="text-[11px] font-bold text-amber-800">{t('baker.tapToLoadPreset', 'Tap to load preset')}</span>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -1689,7 +1689,7 @@ export default function BakerDashboard({
             <div className="flex items-center space-x-2">
               <History className="w-5 h-5 text-[#064e3b]" />
               <h2 className="text-base font-black text-stone-900">
-                Production Batch Records ({todayBatches.length})
+                {t('baker.productionBatchRecords', 'Production Batch Records ({count})').replace('{count}', todayBatches.length)}
               </h2>
             </div>
             
@@ -1702,7 +1702,7 @@ export default function BakerDashboard({
                   historyFilter === 'today' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-900'
                 }`}
               >
-                Today Only
+                {t('baker.todayOnly', 'Today Only')}
               </button>
               <button
                 type="button"
@@ -1711,7 +1711,7 @@ export default function BakerDashboard({
                   historyFilter === 'all' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-900'
                 }`}
               >
-                All Records
+                {t('baker.allRecords', 'All Records')}
               </button>
             </div>
           </div>
@@ -1725,13 +1725,13 @@ export default function BakerDashboard({
               <table className="w-full min-w-[650px] text-left text-xs">
                 <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
                   <tr>
-                    <th className="py-3 px-4">Batch #</th>
-                    <th className="py-3 px-4">Date & Time</th>
-                    <th className="py-3 px-4">Product Name</th>
-                    <th className="py-3 px-4 text-center">Pieces</th>
-                    <th className="py-3 px-4 text-right">Total Weight</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-3 px-4">{t('baker.colBatchNo', 'Batch #')}</th>
+                    <th className="py-3 px-4">{t('baker.colDateTime', 'Date & Time')}</th>
+                    <th className="py-3 px-4">{t('baker.colProductName', 'Product Name')}</th>
+                    <th className="py-3 px-4 text-center">{t('baker.colPieces', 'Pieces')}</th>
+                    <th className="py-3 px-4 text-right">{t('baker.colTotalWeight', 'Total Weight')}</th>
+                    <th className="py-3 px-4">{t('baker.colStatus', 'Status')}</th>
+                    <th className="py-3 px-4 text-right">{t('baker.colActions', 'Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -1813,11 +1813,11 @@ export default function BakerDashboard({
             <div className="flex items-center space-x-2">
               <Package className="w-5 h-5 text-[#064e3b]" />
               <h2 className="text-base font-black text-stone-900">
-                Live Store Ingredients Availability ({rawMaterials.length} Items)
+                {t('baker.liveStoreAvailability', 'Live Store Ingredients Availability ({count} Items)').replace('{count}', rawMaterials.length)}
               </h2>
             </div>
             <span className="text-xs font-bold text-stone-400">
-              Deducted automatically by baking batches
+              {t('baker.deductedAutomatically', 'Deducted automatically by baking batches')}
             </span>
           </div>
 
@@ -1848,7 +1848,7 @@ export default function BakerDashboard({
                     <span className="text-xs font-bold text-stone-500">{mat.unit}</span>
                   </div>
                   <div className="text-[11px] font-bold text-stone-500 mt-1 flex items-center justify-between border-t border-stone-200/60 pt-1">
-                    <span>Min Threshold:</span>
+                    <span>{t('baker.minThreshold', 'Min Threshold:')}</span>
                     <span className={isLow ? 'text-rose-700 font-black' : 'text-stone-700'}>
                       {mat.minimum_stock} {mat.unit}
                     </span>

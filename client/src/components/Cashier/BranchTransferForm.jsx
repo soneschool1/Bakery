@@ -412,7 +412,7 @@ export default function BranchTransferForm({
           </div>
           <div className="inline-flex items-center space-x-1.5 text-xs text-emerald-900 font-black bg-[#E8F6F2] px-3.5 py-1.5 rounded-full border border-[#CDEAE1] self-start sm:self-auto">
             <Package className="w-4 h-4 text-[#0E7452]" />
-            <span>Combined Multi-Bread Dispatch</span>
+            <span>{t('cashier.combinedMultiDispatch', 'Combined Multi-Bread Dispatch')}</span>
           </div>
         </div>
 
@@ -485,7 +485,7 @@ export default function BranchTransferForm({
               <div>
                 <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
                   <Package className="w-4 h-4 text-[#0E7452]" />
-                  <span>2. Select Breads & Quantities for This Trip</span>
+                  <span>2. {t('cashier.tripShipmentManifest', 'Select Breads & Quantities for This Trip')}</span>
                 </label>
                 <p className="text-[11px] text-stone-500 font-medium mt-0.5">
                   Pick any bread from shop stock and add it to the shipment manifest below
@@ -521,7 +521,7 @@ export default function BranchTransferForm({
             {/* Product & Quantity Selector Row */}
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
               <div className="sm:col-span-6 space-y-1">
-                <label className="block text-[11px] font-black text-stone-600">Choose Bread Variety:</label>
+                <label className="block text-[11px] font-black text-stone-600">{t('cashier.addProductToTrip', 'Choose Bread Variety:')}</label>
                 <select
                   value={selectedProductId}
                   onChange={(e) => {
@@ -545,7 +545,7 @@ export default function BranchTransferForm({
 
               <div className="sm:col-span-3 space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="block text-[11px] font-black text-stone-600">Quantity (Pcs):</label>
+                  <label className="block text-[11px] font-black text-stone-600">{t('cashier.quantityToSend', 'Quantity (Pcs):')}</label>
                   <span className="text-[10px] text-stone-400 font-bold">Max: {availableStock}</span>
                 </div>
                 <input
@@ -566,7 +566,7 @@ export default function BranchTransferForm({
                   className="w-full bg-[#0E7452] hover:bg-[#0A573D] text-white font-black text-xs py-2.5 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50 active:scale-95"
                 >
                   <Plus className="w-4 h-4 text-emerald-200" />
-                  <span>Add to Trip</span>
+                  <span>{t('cashier.addToTripBtn', 'Add to Trip')}</span>
                 </button>
               </div>
             </div>
@@ -610,7 +610,7 @@ export default function BranchTransferForm({
             <div className="pt-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
                 <span className="text-xs font-black text-stone-800 flex items-center space-x-1">
-                  <span>📦 Shipment Manifest for This Trip</span>
+                  <span>📦 {t('cashier.tripShipmentManifest', 'Shipment Manifest for This Trip')}</span>
                   <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full">
                     {manifestItems.length} bread varieties
                   </span>
@@ -696,7 +696,7 @@ export default function BranchTransferForm({
                     <tfoot className="bg-emerald-50/60 font-black text-xs border-t border-emerald-200 text-emerald-950">
                       <tr>
                         <td colSpan="4" className="py-2.5 px-3">
-                          Total For This Single Trip:
+                          {t('cashier.totalPiecesInTrip', 'Total For This Single Trip:')}
                         </td>
                         <td className="py-2.5 px-3 text-center text-sm font-black text-[#0E7452]">
                           {totalPiecesInTrip} pcs
@@ -719,7 +719,7 @@ export default function BranchTransferForm({
             <div className="space-y-1.5">
               <label className="block text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
                 <Truck className="w-4 h-4 text-[#0E7452]" />
-                <span>3. Transport Fee (ETB) — Paid Once For Trip *</span>
+                <span>3. {t('cashier.transportationCost', 'Transport Fee (ETB) — Paid Once For Trip *')}</span>
               </label>
               <div className="relative">
                 <input
@@ -740,7 +740,7 @@ export default function BranchTransferForm({
 
             <div className="space-y-1.5">
               <label className="block text-xs font-black text-stone-800 uppercase">
-                Driver & Vehicle / Delivery Notes (Optional)
+                {t('cashier.driverRemarks', 'Driver & Vehicle / Delivery Notes (Optional)')}
               </label>
               <input
                 type="text"
@@ -765,7 +765,7 @@ export default function BranchTransferForm({
             >
               <Send className="w-4 h-4 text-emerald-200" />
               <span>
-                {isSubmitting ? 'Dispatching Trip...' : `CONFIRM & DISPATCH TRIP (${totalPiecesInTrip} PCS • ${formatETB(transportCost)})`}
+                {isSubmitting ? t('cashier.dispatching', 'Dispatching Trip...') : t('cashier.dispatchTripBtn', 'CONFIRM & DISPATCH TRIP ({branch})').replace('{branch}', selectedBranch?.name || '')}
               </span>
             </button>
           </div>
