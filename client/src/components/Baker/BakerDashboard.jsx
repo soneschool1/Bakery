@@ -1339,7 +1339,6 @@ export default function BakerDashboard({
                   const breadPieces = Number(bread.pieces) || 0;
                   const breadWeight = Number(bread.weight_grams) || 100;
                   const breadTotalKg = ((breadPieces * breadWeight) / 1000).toFixed(1);
-                  const breadValue = breadPieces * (Number(bread.selling_price) || 10);
 
                   return (
                     <div 
