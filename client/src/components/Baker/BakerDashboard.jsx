@@ -21,9 +21,12 @@ import {
   Edit3,
   Calendar,
   Clock,
-  RotateCcw
+  RotateCcw,
+  Trash2,
+  X
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import { formatETB } from '../../utils/formatters';
 
 function isSameCategory(cat1, cat2) {
   if (!cat1 || !cat2) return false;
@@ -80,36 +83,105 @@ export default function BakerDashboard({
     return (products || []).filter(p => p.active && isSameCategory(p.category, cookingCategory));
   }, [products, cookingCategory]);
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  // Multiple Selected Bread Varieties in Batch
+  const [selectedBreads, setSelectedBreads] = useState(() => {
+    const defaultP = (products || []).find(p => p.active && isSameCategory(p.category, 'Bread'));
+    return [{
+      productId: defaultP?.id || 'default-bread-1',
+      name: defaultP?.name || 'Bread 1 (Special Table)',
+      category: 'Bread',
+      selling_price: defaultP?.selling_price || 10,
+      standard_weight_grams: defaultP?.weight_grams || 100,
+      weight_grams: defaultP?.weight_grams || 100,
+      pieces: 250,
+    }];
+  });
 
-  // Resolve active selected product
-  const activeProduct = useMemo(() => {
-    if (selectedProduct && isSameCategory(selectedProduct.category, cookingCategory)) {
-      return selectedProduct;
+  // Keep selectedBreads synced when products arrive from backend
+  useEffect(() => {
+    if (products && products.length > 0) {
+      setSelectedBreads(prev => {
+        const hasPlaceholder = prev.some(b => String(b.productId).startsWith('default-'));
+        if (hasPlaceholder) {
+          const matching = products.filter(p => p.active && isSameCategory(p.category, cookingCategory));
+          if (matching.length > 0) {
+            return [{
+              productId: matching[0].id,
+              name: matching[0].name,
+              category: matching[0].category,
+              selling_price: matching[0].selling_price || 10,
+              standard_weight_grams: matching[0].weight_grams || 100,
+              weight_grams: matching[0].weight_grams || 100,
+              pieces: 250,
+            }];
+          }
+        }
+        return prev;
+      });
     }
-    if (categoryProducts.length > 0) {
-      return categoryProducts[0];
+  }, [products, cookingCategory]);
+
+  // Derived totals across all selected breads
+  const totalPieces = useMemo(() => {
+    return selectedBreads.reduce((sum, b) => sum + (Number(b.pieces) || 0), 0);
+  }, [selectedBreads]);
+
+  const totalDoughRequiredG = useMemo(() => {
+    return selectedBreads.reduce((sum, b) => sum + ((Number(b.pieces) || 0) * (Number(b.weight_grams) || 100)), 0);
+  }, [selectedBreads]);
+
+  const totalDoughRequiredKg = useMemo(() => {
+    return (totalDoughRequiredG / 1000).toFixed(1);
+  }, [totalDoughRequiredG]);
+
+  const totalPotentialValue = useMemo(() => {
+    return selectedBreads.reduce((sum, b) => sum + ((Number(b.pieces) || 0) * (Number(b.selling_price) || 10)), 0);
+  }, [selectedBreads]);
+
+  // Backward compatibility alias for single-product references
+  const activeProduct = useMemo(() => {
+    if (selectedBreads.length > 0) {
+      return {
+        id: selectedBreads[0].productId,
+        name: selectedBreads.map(b => b.name).join(' + '),
+        category: selectedBreads[0].category || cookingCategory,
+        weight_grams: selectedBreads[0].weight_grams,
+        selling_price: selectedBreads[0].selling_price,
+      };
     }
     return {
       id: 'default',
-      name: cookingCategory === 'Bread' 
-        ? 'Bread 1 (Special Table)' 
-        : cookingCategory === 'Cookies' 
-        ? 'Selit Tea Cookies' 
-        : cookingCategory === 'Cake' 
-        ? 'Chocolate Fudge Cake Slice' 
-        : 'Butter French Croissant',
-      weight_grams: cookingCategory === 'Bread' ? 100 : cookingCategory === 'Cookies' ? 40 : 80,
+      name: 'Bread 1 (Special Table)',
+      category: cookingCategory,
+      weight_grams: 100,
       selling_price: 10,
-      category: cookingCategory
     };
-  }, [selectedProduct, cookingCategory, categoryProducts]);
+  }, [selectedBreads, cookingCategory]);
 
-  // Pieces produced
-  const [piecesProduced, setPiecesProduced] = useState(500);
+  // Setters for backward compatibility
+  function setPiecesProduced(val) {
+    if (selectedBreads.length === 1) {
+      handleUpdateBreadPieces(selectedBreads[0].productId, val);
+    } else if (selectedBreads.length > 1) {
+      // Proportionally update or evenly distribute
+      const count = selectedBreads.length;
+      const numVal = parseInt(val, 10) || 0;
+      const perBread = Math.floor(numVal / count);
+      setSelectedBreads(prev => prev.map((b, idx) => ({
+        ...b,
+        pieces: idx === 0 ? perBread + (numVal % count) : perBread,
+      })));
+    }
+  }
 
-  // Dough weight in grams used to bake 1 piece (Step 4)
-  const [doughGramsPerPiece, setDoughGramsPerPiece] = useState('100');
+  function setDoughGramsPerPiece(val) {
+    if (selectedBreads.length > 0) {
+      setSelectedBreads(prev => prev.map(b => ({ ...b, weight_grams: Number(val) || 100 })));
+    }
+  }
+
+  const piecesProduced = totalPieces;
+  const doughGramsPerPiece = selectedBreads[0]?.weight_grams || 100;
 
   // Ingredients for Bread
   const [flourKg, setFlourKg] = useState('35');
@@ -125,10 +197,10 @@ export default function BakerDashboard({
   const [tekurAzmudGrams, setTekurAzmudGrams] = useState('500');
 
   // Values for backend API payload
-  const unitPrice = activeProduct?.selling_price || 10;
-  const unitWeight = Number(doughGramsPerPiece) || activeProduct?.weight_grams || 100;
-  const totalWeightGrams = (Number(piecesProduced) || 0) * unitWeight;
-  const totalWeightKg = (totalWeightGrams / 1000).toFixed(1);
+  const unitPrice = totalPieces > 0 ? Math.round((totalPotentialValue / totalPieces) * 100) / 100 : 10;
+  const unitWeight = selectedBreads[0]?.weight_grams || 100;
+  const totalWeightGrams = totalDoughRequiredG;
+  const totalWeightKg = totalDoughRequiredKg;
 
   // Batch dough estimation (flour + water ~60% hydration + dry ingredients)
   const flourGrams = (Number(flourKg) || 0) * 1000;
@@ -141,6 +213,9 @@ export default function BakerDashboard({
       ? (Number(sugarGrams) || 0) + (Number(selitGrams) || 0) + (Number(tekurAzmudGrams) || 0)
       : 0)
   );
+  const estimatedDoughTotalKg = (estimatedDoughTotalG / 1000).toFixed(1);
+  const doughDifferenceG = estimatedDoughTotalG - totalDoughRequiredG;
+  const doughDifferenceKg = (doughDifferenceG / 1000).toFixed(1);
 
   // Raw material low-stock checks
   const lowStockMaterials = useMemo(() => {
@@ -203,7 +278,6 @@ export default function BakerDashboard({
   // Apply a 1-tap preset
   function handleApplyPreset(preset) {
     setCookingCategory(preset.cat);
-    setSelectedProduct(null);
     setFlourKg(preset.flour || '35');
     setMajMixGrams(preset.maj || '500');
     setYeastGrams(preset.yeast || '250');
@@ -211,34 +285,48 @@ export default function BakerDashboard({
     if (preset.sugar) setSugarGrams(preset.sugar);
     if (preset.selit) setSelitGrams(preset.selit);
     if (preset.azmud) setTekurAzmudGrams(preset.azmud);
-    setDoughGramsPerPiece(String(preset.weight || 100));
-    setPiecesProduced(preset.pieces || 500);
 
-    setSuccessMsg(`✨ Preset loaded: ${preset.label}! Moving to Step 5 (Confirm & Bake)...`);
+    // Find product for preset or use default
+    const matchingProds = (products || []).filter(p => p.active && isSameCategory(p.category, preset.cat));
+    const p = matchingProds.length > 0 ? matchingProds[0] : {
+      id: 'default',
+      name: preset.label.replace(/^[^\w]+/, '').replace(/\([^)]*\)/, '').trim(),
+      category: preset.cat,
+      selling_price: 10,
+      weight_grams: Number(preset.weight || 100),
+    };
+
+    setSelectedBreads([{
+      productId: p.id,
+      name: p.name,
+      category: preset.cat,
+      selling_price: p.selling_price || 10,
+      standard_weight_grams: p.weight_grams || Number(preset.weight || 100),
+      weight_grams: Number(preset.weight || 100),
+      pieces: preset.pieces || 500,
+    }]);
+
+    setSuccessMsg(`✨ Preset loaded: ${preset.label}! Moving to Step 4 (Dough Weight & Pieces)...`);
     setTimeout(() => {
       setSuccessMsg('');
-      setActiveStep(5);
-    }, 800);
+      setActiveStep(4);
+      setHighlightedStep(4);
+    }, 600);
   }
 
   // 1. SELECT BAKING CATEGORY (WITH OPTIONAL AUTO-ADVANCE)
   function handleCategorySelect(catId) {
     setCookingCategory(catId);
-    setSelectedProduct(null);
     setAnimatingCategory(catId);
-    setAutoAdvanceNotice(`✨ ${catId} chosen! Moving to Step 2...`);
+    setAutoAdvanceNotice(`✨ ${catId} chosen! Moving to Step 2 (Select Varieties)...`);
 
     // Smart default presets per category
     if (catId === 'Bread') {
-      setPiecesProduced(500);
-      setDoughGramsPerPiece('100');
       setFlourKg('35');
       setMajMixGrams('500');
       setYeastGrams('250');
       setSaltGrams('500');
     } else if (catId === 'Cookies') {
-      setPiecesProduced(200);
-      setDoughGramsPerPiece('40');
       setFlourKg('20');
       setMajMixGrams('250');
       setYeastGrams('0');
@@ -247,20 +335,33 @@ export default function BakerDashboard({
       setSelitGrams('1000');
       setTekurAzmudGrams('300');
     } else if (catId === 'Cake') {
-      setPiecesProduced(20);
-      setDoughGramsPerPiece('80');
       setFlourKg('10');
       setMajMixGrams('0');
       setYeastGrams('0');
       setSaltGrams('50');
       setSugarGrams('5000');
     } else {
-      setPiecesProduced(100);
-      setDoughGramsPerPiece('70');
       setFlourKg('15');
       setMajMixGrams('300');
       setYeastGrams('150');
       setSaltGrams('200');
+    }
+
+    // Default first product in category
+    const prods = (products || []).filter(p => p.active && isSameCategory(p.category, catId));
+    if (prods.length > 0) {
+      const p = prods[0];
+      const defaultPieces = catId === 'Bread' ? 250 : catId === 'Cookies' ? 100 : 20;
+      const defaultWeight = p.weight_grams || (catId === 'Bread' ? 100 : catId === 'Cookies' ? 40 : 80);
+      setSelectedBreads([{
+        productId: p.id,
+        name: p.name,
+        category: p.category,
+        selling_price: p.selling_price || 10,
+        standard_weight_grams: p.weight_grams || defaultWeight,
+        weight_grams: defaultWeight,
+        pieces: defaultPieces,
+      }]);
     }
 
     setTimeout(() => {
@@ -276,26 +377,73 @@ export default function BakerDashboard({
     }, 320);
   }
 
-  // 2. SELECT PRODUCT VARIETY
-  function handleProductSelect(p) {
-    setSelectedProduct(p);
-    if (p.weight_grams) {
-      setDoughGramsPerPiece(String(p.weight_grams));
-    }
-    setAnimatingProduct(p.id);
-    setAutoAdvanceNotice(`✨ ${p.name} selected! Moving to Step 3 (Ingredients)...`);
-
-    setTimeout(() => {
-      setAnimatingProduct(null);
-      setAutoAdvanceNotice('');
-      setActiveStep(3);
-      setHighlightedStep(3);
-
-      if (viewMode === 'scroll') {
-        step3Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // 2. TOGGLE / SELECT PRODUCT VARIETY IN BATCH (MULTI-SELECT)
+  function handleToggleBread(p) {
+    setSelectedBreads(prev => {
+      const exists = prev.some(b => b.productId === p.id);
+      if (exists) {
+        if (prev.length === 1) {
+          setAutoAdvanceNotice(`ℹ️ "${p.name}" is the only variety selected. Select another bread first before removing.`);
+          setTimeout(() => setAutoAdvanceNotice(''), 3000);
+          return prev;
+        }
+        return prev.filter(b => b.productId !== p.id);
+      } else {
+        const defaultPieces = cookingCategory === 'Bread' ? 200 : cookingCategory === 'Cookies' ? 100 : 15;
+        const defaultWeight = p.weight_grams || (cookingCategory === 'Bread' ? 100 : cookingCategory === 'Cookies' ? 40 : 80);
+        return [
+          ...prev,
+          {
+            productId: p.id,
+            name: p.name,
+            category: p.category,
+            selling_price: p.selling_price || 10,
+            standard_weight_grams: p.weight_grams || defaultWeight,
+            weight_grams: defaultWeight,
+            pieces: defaultPieces,
+          }
+        ];
       }
-      setTimeout(() => setHighlightedStep(null), 1400);
-    }, 280);
+    });
+  }
+
+  function handleSelectAllBreads() {
+    if (categoryProducts.length === 0) return;
+    const all = categoryProducts.map(p => {
+      const existing = selectedBreads.find(b => b.productId === p.id);
+      if (existing) return existing;
+      const defaultPieces = cookingCategory === 'Bread' ? 200 : cookingCategory === 'Cookies' ? 80 : 10;
+      const defaultWeight = p.weight_grams || 100;
+      return {
+        productId: p.id,
+        name: p.name,
+        category: p.category,
+        selling_price: p.selling_price || 10,
+        standard_weight_grams: p.weight_grams || defaultWeight,
+        weight_grams: defaultWeight,
+        pieces: defaultPieces,
+      };
+    });
+    setSelectedBreads(all);
+  }
+
+  function handleRemoveBread(productId) {
+    if (selectedBreads.length <= 1) {
+      setAutoAdvanceNotice('ℹ️ Batch must contain at least one bread variety.');
+      setTimeout(() => setAutoAdvanceNotice(''), 3000);
+      return;
+    }
+    setSelectedBreads(prev => prev.filter(b => b.productId !== productId));
+  }
+
+  function handleUpdateBreadWeight(productId, weight) {
+    const num = Math.max(1, Number(weight) || 0);
+    setSelectedBreads(prev => prev.map(b => b.productId === productId ? { ...b, weight_grams: num } : b));
+  }
+
+  function handleUpdateBreadPieces(productId, pieces) {
+    const num = pieces === '' ? '' : Math.max(0, parseInt(pieces, 10) || 0);
+    setSelectedBreads(prev => prev.map(b => b.productId === productId ? { ...b, pieces: num } : b));
   }
 
   // Direct step navigation
@@ -314,13 +462,12 @@ export default function BakerDashboard({
     if (e) e.preventDefault();
     setErrorMessage('');
 
-    if (!activeProduct) {
-      setErrorMessage('Please select a product to bake.');
+    if (selectedBreads.length === 0) {
+      setErrorMessage('Please select at least one bread variety to bake.');
       return;
     }
 
-    const pieces = Number(piecesProduced);
-    if (isNaN(pieces) || pieces <= 0) {
+    if (totalPieces <= 0) {
       setErrorMessage('Please enter a valid number of pieces produced (greater than 0).');
       return;
     }
@@ -367,17 +514,28 @@ export default function BakerDashboard({
       ingredientsConsumed.push({ name: 'Flour', quantity: Number(flourKg) || 10, unit: 'kg' });
     }
 
+    const itemsPayload = selectedBreads.map(b => ({
+      product_id: b.productId,
+      product_name: b.name,
+      category: b.category,
+      pieces_produced: Number(b.pieces) || 0,
+      dough_weight_grams: Number(b.weight_grams) || 100,
+      total_weight_grams: (Number(b.pieces) || 0) * (Number(b.weight_grams) || 100),
+      unit_selling_price: Number(b.selling_price) || 10,
+    }));
+
     const payload = {
-      category: activeProduct.category || cookingCategory,
-      product_id: activeProduct.id,
-      product_name: activeProduct.name,
+      category: cookingCategory,
+      product_id: selectedBreads[0].productId,
+      product_name: selectedBreads.map(b => b.name).join(' + '),
       baker_id: baker?.id || baker?.username || 'baker',
       baker_name: baker?.full_name || 'Dawit Alemu (Head Baker)',
-      pieces_produced: pieces,
-      total_weight_grams: pieces * unitWeight,
-      unit_selling_price: unitPrice > 0 ? unitPrice : 10,
+      pieces_produced: totalPieces,
+      total_weight_grams: totalDoughRequiredG,
+      unit_selling_price: totalPieces > 0 ? Math.round((totalPotentialValue / totalPieces) * 100) / 100 : 10,
       ingredients_consumed: ingredientsConsumed,
-      remarks: `Baked by ${baker?.full_name || 'Head Baker'}: ${pieces} pcs`,
+      items: itemsPayload,
+      remarks: `Combined batch of ${selectedBreads.length} varieties: ${selectedBreads.map(b => `${b.pieces} pcs ${b.name} (${b.weight_grams}g)`).join(', ')}`,
       branch_id: baker?.branch_id || 'main',
     };
 
@@ -385,7 +543,7 @@ export default function BakerDashboard({
       if (onCreateBatch) {
         await onCreateBatch(payload);
       }
-      setSuccessMsg(`🎉 SUCCESS! ${pieces} pieces of ${activeProduct.name} recorded! Finished stock is now available for cashiers.`);
+      setSuccessMsg(`🎉 SUCCESS! ${totalPieces} total pieces across ${selectedBreads.length} bread varieties recorded! Finished stock is now available for cashiers.`);
       setTimeout(() => setSuccessMsg(''), 8000);
       setOtherIngName('');
       setOtherIngQty('');
@@ -435,10 +593,10 @@ export default function BakerDashboard({
 
   const stepTitles = [
     { num: 1, title: 'Category', subtitle: cookingCategory, icon: Wheat },
-    { num: 2, title: 'Variety', subtitle: activeProduct.name, icon: Cookie },
-    { num: 3, title: 'Ingredients', subtitle: `${flourKg}kg flour`, icon: Scale },
-    { num: 4, title: 'Dough Weight', subtitle: `${doughGramsPerPiece}g portion`, icon: Layers },
-    { num: 5, title: 'Bake & Send', subtitle: `${piecesProduced} pcs`, icon: CheckCircle2 },
+    { num: 2, title: 'Varieties', subtitle: `${selectedBreads.length} selected`, icon: Cookie },
+    { num: 3, title: 'Ingredients', subtitle: `${flourKg}kg flour (~${estimatedDoughTotalKg}kg dough)`, icon: Scale },
+    { num: 4, title: 'Dough Weight', subtitle: `${selectedBreads.length > 1 ? selectedBreads.length + ' varieties' : (selectedBreads[0]?.weight_grams || 100) + 'g portion'}`, icon: Layers },
+    { num: 5, title: 'Bake & Send', subtitle: `${totalPieces} pcs total`, icon: CheckCircle2 },
   ];
 
   return (
@@ -731,88 +889,138 @@ export default function BakerDashboard({
             </div>
           )}
 
-          {/* STEP 2: CHOOSE PRODUCT VARIETY */}
+          {/* STEP 2: CHOOSE PRODUCT VARIETIES (MULTI-SELECT) */}
           {(viewMode === 'scroll' || activeStep === 2) && (
             <div 
               ref={step2Ref}
-              className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4 transition-all duration-300 ${
+              className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-5 transition-all duration-300 ${
                 highlightedStep === 2 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
-                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs">
+                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       2
                     </span>
-                    <span>Select Type of {cookingCategory}:</span>
+                    <span>Select Varieties of {cookingCategory} to Bake Together:</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Choose the baked variety — automatically sets standard dough weight & advances
+                    Check off one or multiple varieties to bake together in this batch. Content & dough weights combine automatically.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => jumpToStep(1)}
-                  className="text-xs font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center space-x-1"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Change Category</span>
-                </button>
+                
+                <div className="flex items-center space-x-2 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllBreads}
+                    className="text-xs font-black text-[#0E7452] hover:text-[#064e3b] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => jumpToStep(1)}
+                    className="text-xs font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center space-x-1"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Change Category</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Product variety cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Product variety cards grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categoryProducts.length === 0 ? (
-                  <div className="col-span-3 text-center py-8 text-stone-400 font-bold text-xs bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                  <div className="col-span-full text-center py-10 text-stone-400 font-bold text-xs bg-stone-50 rounded-2xl border border-dashed border-stone-200">
                     No active products found in category "{cookingCategory}". Please select another category.
                   </div>
                 ) : (
                   categoryProducts.map((p) => {
-                    const isSelected = activeProduct.id === p.id;
-                    const isAnimating = animatingProduct === p.id;
+                    const isSelected = selectedBreads.some(b => b.productId === p.id);
                     return (
-                      <button
+                      <div
                         key={p.id}
-                        type="button"
-                        onClick={() => handleProductSelect(p)}
-                        className={`group p-5 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between h-36 relative cursor-pointer overflow-hidden ${
-                          isAnimating
-                            ? 'scale-104 border-[#0E7452] bg-emerald-100 ring-6 ring-emerald-500/40 shadow-xl'
-                            : isSelected
-                            ? 'border-[#0E7452] bg-emerald-50/90 shadow-lg ring-3 ring-emerald-500/30 scale-102'
-                            : 'border-stone-200 bg-stone-50 hover:bg-white hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5'
+                        onClick={() => handleToggleBread(p)}
+                        className={`group p-4 sm:p-5 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between min-h-[9rem] relative cursor-pointer select-none ${
+                          isSelected
+                            ? 'border-[#0E7452] bg-emerald-50/90 shadow-md ring-2 ring-emerald-500/30'
+                            : 'border-stone-200 bg-stone-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-xs'
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <span className="font-black text-base text-stone-900 group-hover:text-[#0E7452] block transition-colors">{p.name}</span>
-                            <span className="text-xs font-bold text-stone-500">{p.category}</span>
-                          </div>
-                          {isSelected && (
-                            <div className="w-6 h-6 rounded-full bg-[#0E7452] text-white flex items-center justify-center shadow-xs">
-                              <Check className="w-4 h-4" />
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="font-black text-base text-stone-900 group-hover:text-[#0E7452] block transition-colors truncate">
+                              {p.name}
+                            </span>
+                            <div className="flex items-center space-x-2 text-xs font-bold text-stone-500 mt-0.5">
+                              <span>{p.category}</span>
+                              <span>•</span>
+                              <span className="text-[#0E7452] font-black">{formatETB(p.selling_price || 10)}</span>
                             </div>
-                          )}
+                          </div>
+
+                          {/* Checkbox badge */}
+                          <div className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all shrink-0 ${
+                            isSelected
+                              ? 'bg-[#0E7452] text-white shadow-xs'
+                              : 'border-2 border-stone-300 bg-white group-hover:border-[#0E7452] text-transparent'
+                          }`}>
+                            <Check className="w-4 h-4 stroke-[3]" />
+                          </div>
                         </div>
 
-                        <div className="pt-2 border-t border-emerald-200/60 flex items-center justify-between">
-                          <span className="text-xs font-bold text-stone-500">Standard Dough:</span>
-                          <span className="text-sm font-black text-[#0E7452] bg-white px-3 py-1 rounded-xl border border-emerald-200 shadow-2xs group-hover:bg-emerald-50 transition-colors">
-                            {p.weight_grams} g
+                        <div className="pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs mt-3">
+                          <span className="font-bold text-stone-500">Standard Portion:</span>
+                          <span className={`font-black px-2.5 py-0.5 rounded-lg border text-xs ${
+                            isSelected
+                              ? 'bg-white border-emerald-300 text-[#0E7452]'
+                              : 'bg-white border-stone-200 text-stone-700'
+                          }`}>
+                            {p.weight_grams || 100}g
                           </span>
                         </div>
-
-                        {isAnimating && (
-                          <div className="absolute inset-x-0 bottom-0 bg-[#0E7452] text-white text-[10px] font-black py-0.5 px-2 text-center flex items-center justify-center space-x-1 animate-pulse">
-                            <Sparkles className="w-2.5 h-2.5 text-emerald-200" />
-                            <span>Advancing to Ingredients...</span>
-                          </div>
-                        )}
-                      </button>
+                      </div>
                     );
                   })
                 )}
+              </div>
+
+              {/* Bottom Selected Varieties Summary Bar */}
+              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 space-y-2">
+                <div className="flex items-center justify-between text-xs font-black text-emerald-950">
+                  <span className="flex items-center space-x-1.5">
+                    <Package className="w-4 h-4 text-[#0E7452]" />
+                    <span>Varieties Included in Batch ({selectedBreads.length}):</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-800">
+                    Click any card above to add or remove
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {selectedBreads.map((b) => (
+                    <div 
+                      key={b.productId}
+                      className="bg-white border border-emerald-300 text-stone-900 rounded-xl px-3 py-1.5 text-xs font-black shadow-2xs flex items-center space-x-2"
+                    >
+                      <span>🥖 {b.name} ({b.weight_grams || 100}g)</span>
+                      {selectedBreads.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveBread(b.productId);
+                          }}
+                          className="w-4 h-4 rounded-full bg-stone-100 hover:bg-rose-100 text-stone-400 hover:text-rose-700 flex items-center justify-center cursor-pointer transition-colors"
+                          title="Remove from batch"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Step 2 Footer Navigation */}
@@ -828,9 +1036,9 @@ export default function BakerDashboard({
                 <button
                   type="button"
                   onClick={() => jumpToStep(3)}
-                  className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                  className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Check Ingredients</span>
+                  <span>Next: Check Ingredients ({selectedBreads.length} Varieties)</span>
                   <ArrowRight className="w-4 h-4 text-emerald-200" />
                 </button>
               </div>
@@ -845,20 +1053,21 @@ export default function BakerDashboard({
                 highlightedStep === 3 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
-                    <span className="w-8 h-8 rounded-full bg-[#064e3b] text-white inline-flex items-center justify-center text-sm font-black shadow-xs">
+                    <span className="w-8 h-8 rounded-full bg-[#064e3b] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       3
                     </span>
                     <span>Enter Ingredients Used for This Batch:</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Measure and enter exact ingredient weights used in the mixer
+                    Measure and enter exact ingredient weights used in the mixer for this batch
                   </p>
                 </div>
-                <div className="hidden sm:flex items-center space-x-1 text-xs font-bold bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200">
-                  <span>Selected: <strong>{activeProduct.name}</strong></span>
+                <div className="flex items-center space-x-2 text-xs font-bold bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200 self-start sm:self-auto">
+                  <Package className="w-4 h-4 text-[#064e3b]" />
+                  <span>Varieties: <strong>{selectedBreads.length} selected</strong></span>
                 </div>
               </div>
 
@@ -1011,6 +1220,62 @@ export default function BakerDashboard({
                 </div>
               )}
 
+              {/* Combined Dough Estimation & Batch Yield Planning Card */}
+              <div className="bg-gradient-to-r from-emerald-50 via-stone-50 to-emerald-50/80 border-2 border-emerald-200/80 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-2.5">
+                  <div className="flex items-center space-x-2">
+                    <Scale className="w-5 h-5 text-[#064e3b]" />
+                    <span className="text-sm font-black text-emerald-950">
+                      Combined Dough Estimation & Batch Yield Balance
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-stone-500">
+                    Based on {flourKg || 0} kg flour + ~60% mixer hydration & dry mix
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
+                    <span className="text-stone-500 font-bold block">Estimated Mixer Dough Yield:</span>
+                    <span className="text-2xl font-black text-[#064e3b] block mt-0.5">
+                      ~{estimatedDoughTotalKg} kg
+                    </span>
+                    <span className="text-[11px] text-stone-400 font-medium">
+                      Total raw dough in mixing bowl
+                    </span>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs">
+                    <span className="text-stone-500 font-bold block">Planned Bread Dough Needed:</span>
+                    <span className="text-2xl font-black text-stone-900 block mt-0.5">
+                      {totalDoughRequiredKg} kg
+                    </span>
+                    <span className="text-[11px] text-stone-400 font-medium">
+                      {totalPieces} pcs across {selectedBreads.length} varieties
+                    </span>
+                  </div>
+
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200 shadow-2xs flex flex-col justify-between">
+                    <div>
+                      <span className="text-stone-500 font-bold block">Batch Balance Status:</span>
+                      <span className={`inline-flex items-center space-x-1 font-black text-xs px-2.5 py-1 rounded-lg mt-1 ${
+                        Number(doughDifferenceKg) >= 0 
+                          ? 'bg-emerald-100 text-emerald-900' 
+                          : 'bg-amber-100 text-amber-900'
+                      }`}>
+                        <span>{Number(doughDifferenceKg) >= 0 ? '✓ Balanced' : '⚠️ Deficit'}</span>
+                        <span>({Number(doughDifferenceKg) >= 0 ? `+${doughDifferenceKg} kg buffer` : `${doughDifferenceKg} kg needed`})</span>
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-stone-400 mt-1 font-medium">
+                      {Number(doughDifferenceKg) >= 0 
+                        ? 'Mixer dough is sufficient for all planned bread varieties.' 
+                        : 'Increase flour or adjust pieces in Step 4.'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Step 3 Footer Navigation */}
               <div className="pt-2 flex items-center justify-between border-t border-stone-100">
                 <button
@@ -1024,92 +1289,283 @@ export default function BakerDashboard({
                 <button
                   type="button"
                   onClick={() => jumpToStep(4)}
-                  className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                  className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Set Dough Weight</span>
+                  <span>Next: Set Dough Weight & Quantities ({selectedBreads.length} Varieties)</span>
                   <ArrowRight className="w-4 h-4 text-emerald-300" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: ENTER DOUGH WEIGHT PER 1 PIECE */}
+          {/* STEP 4: ENTER DOUGH WEIGHT & QUANTITIES PER BREAD VARIETY */}
           {(viewMode === 'scroll' || activeStep === 4) && (
             <div 
               ref={step4Ref}
-              className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4 transition-all duration-300 ${
+              className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6 transition-all duration-300 ${
                 highlightedStep === 4 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
-                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs">
+                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       4
                     </span>
-                    <span>Dough Weight Used for 1 {cookingCategory} (Grams):</span>
+                    <span>Dough Weight & Quantities for Each Variety:</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Enter how many grams of raw dough you portioned for 1 piece before baking
+                    Adjust the raw portion weight (grams) and production pieces separately for each bread in this batch
                   </p>
                 </div>
-                <div className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-stone-500">
-                  <Scale className="w-4 h-4 text-[#0E7452]" />
-                  <span>Portion Consistency</span>
-                </div>
-              </div>
-
-              {/* Quick Dough Weight Presets */}
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {[40, 60, 80, 100, 120, 150].map((grams) => (
+                <div className="flex items-center space-x-2 self-start sm:self-auto">
+                  <span className="text-xs font-black text-[#0E7452] bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5">
+                    <Package className="w-4 h-4" />
+                    <span>{selectedBreads.length} {selectedBreads.length === 1 ? 'Variety' : 'Varieties'}</span>
+                  </span>
                   <button
-                    key={grams}
                     type="button"
-                    onClick={() => setDoughGramsPerPiece(String(grams))}
-                    className={`py-2.5 rounded-2xl font-black text-sm transition-all duration-150 cursor-pointer active:scale-95 ${
-                      Number(doughGramsPerPiece) === grams
-                        ? 'bg-[#0E7452] text-white shadow-md scale-102 ring-2 ring-[#0E7452]/40'
-                        : 'bg-stone-100 text-stone-700 hover:bg-stone-200 hover:-translate-y-0.5'
-                    }`}
+                    onClick={() => jumpToStep(2)}
+                    className="text-xs font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center space-x-1"
+                    title="Add or remove bread varieties"
                   >
-                    {grams}g
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add/Remove Bread</span>
                   </button>
-                ))}
+                </div>
               </div>
 
-              {/* Manual Dough Weight Numeric Input */}
-              <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-5">
-                <div className="flex-1 max-w-sm w-full">
-                  <label className="block text-xs font-black text-stone-700 uppercase mb-1.5">
-                    Dough Weight per Piece (Grams) *
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={doughGramsPerPiece}
-                      onChange={(e) => setDoughGramsPerPiece(e.target.value)}
-                      className="w-full text-2xl font-black text-[#0E7452] bg-white border-2 border-emerald-300 focus:border-[#0E7452] rounded-xl px-4 py-3 focus:outline-none transition-all shadow-xs"
-                      placeholder="e.g. 100"
-                    />
-                    <span className="absolute right-4 text-sm font-black text-stone-500 uppercase">
-                      grams
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-stone-500 mt-1 block">
-                    Type exact portion weight in grams used before baking
+              {/* Individual Variety Cards List */}
+              <div className="space-y-4">
+                {selectedBreads.map((bread, index) => {
+                  const breadPieces = Number(bread.pieces) || 0;
+                  const breadWeight = Number(bread.weight_grams) || 100;
+                  const breadTotalKg = ((breadPieces * breadWeight) / 1000).toFixed(1);
+                  const breadValue = breadPieces * (Number(bread.selling_price) || 10);
+
+                  return (
+                    <div 
+                      key={bread.productId} 
+                      className="bg-stone-50/70 border-2 border-stone-200 hover:border-emerald-300 rounded-2xl p-4 sm:p-5 space-y-4 transition-all"
+                    >
+                      {/* Variety Card Top Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-200">
+                        <div className="flex items-center space-x-3">
+                          <span className="w-7 h-7 rounded-lg bg-[#0E7452] text-white inline-flex items-center justify-center text-xs font-black shrink-0">
+                            #{index + 1}
+                          </span>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <h3 className="text-base font-black text-stone-900">
+                                {bread.name}
+                              </h3>
+                              <span className="text-[11px] font-bold bg-white text-stone-600 px-2 py-0.5 rounded-md border border-stone-200">
+                                {bread.category}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs font-semibold text-stone-500 mt-0.5">
+                              <span>Cashier Price: <strong className="text-[#0E7452]">{formatETB(bread.selling_price || 10)}</strong></span>
+                              <span>•</span>
+                              <span>Standard: <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 self-end sm:self-auto">
+                          {/* Variety subtotal preview badge */}
+                          <div className="text-right text-xs bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
+                            <span className="text-stone-400 font-bold block text-[10px] uppercase">Dough & Value</span>
+                            <span className="font-black text-[#0E7452]">
+                              {breadTotalKg} kg • {formatETB(breadValue)}
+                            </span>
+                          </div>
+
+                          {selectedBreads.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveBread(bread.productId)}
+                              className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-rose-100 text-stone-400 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                              title={`Remove ${bread.name} from batch`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Weight and Pieces Controls Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        {/* 1. Portion Weight Control */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
+                              <Scale className="w-3.5 h-3.5 text-[#0E7452]" />
+                              <span>Portion Weight (Grams):</span>
+                            </label>
+                            <span className="text-[11px] font-bold text-stone-500">
+                              Target per piece
+                            </span>
+                          </div>
+
+                          {/* Quick Weight Presets */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {[40, 60, 80, 100, 120, 150, 200].map((g) => (
+                              <button
+                                key={g}
+                                type="button"
+                                onClick={() => handleUpdateBreadWeight(bread.productId, g)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                                  breadWeight === g
+                                    ? 'bg-[#0E7452] text-white shadow-xs'
+                                    : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
+                                }`}
+                              >
+                                {g}g
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Numeric input with +/- step */}
+                          <div className="flex items-center space-x-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateBreadWeight(bread.productId, Math.max(10, breadWeight - 10))}
+                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                            >
+                              -
+                            </button>
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={bread.weight_grams}
+                                onChange={(e) => handleUpdateBreadWeight(bread.productId, e.target.value)}
+                                className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-stone-900 text-center focus:outline-none"
+                              />
+                              <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">g</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateBreadWeight(bread.productId, breadWeight + 10)}
+                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 2. Pieces Baked Control */}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
+                              <Package className="w-3.5 h-3.5 text-[#0E7452]" />
+                              <span>Pieces Baked for {bread.name}:</span>
+                            </label>
+                            <span className="text-[11px] font-bold text-stone-500">
+                              Units produced
+                            </span>
+                          </div>
+
+                          {/* Quick Pieces Presets */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {[50, 100, 150, 200, 250, 300, 500].map((pQty) => (
+                              <button
+                                key={pQty}
+                                type="button"
+                                onClick={() => handleUpdateBreadPieces(bread.productId, pQty)}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                                  breadPieces === pQty
+                                    ? 'bg-[#0E7452] text-white shadow-xs'
+                                    : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
+                                }`}
+                              >
+                                {pQty} pcs
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Numeric input with +/- step */}
+                          <div className="flex items-center space-x-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateBreadPieces(bread.productId, Math.max(0, breadPieces - 25))}
+                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                            >
+                              -
+                            </button>
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={bread.pieces}
+                                onChange={(e) => handleUpdateBreadPieces(bread.productId, e.target.value)}
+                                className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-[#0E7452] text-center focus:outline-none"
+                              />
+                              <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">pcs</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateBreadPieces(bread.productId, breadPieces + 25)}
+                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Batch Consolidated Summary Card */}
+              <div className="bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-stone-50 border-2 border-emerald-300 rounded-2xl p-5 shadow-xs space-y-3">
+                <div className="flex items-center justify-between text-xs font-black text-emerald-950 uppercase tracking-wider">
+                  <span className="flex items-center space-x-2">
+                    <Layers className="w-4 h-4 text-[#0E7452]" />
+                    <span>Combined Batch Totals ({selectedBreads.length} Varieties)</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-emerald-800">
+                    Live Combined Output
                   </span>
                 </div>
 
-                {/* Live Dough Yield Estimate */}
-                <div className="text-left sm:text-right bg-white p-4 rounded-xl border border-emerald-200 text-xs shadow-2xs w-full sm:w-auto shrink-0 sm:min-w-[200px]">
-                  <span className="text-stone-400 font-bold block">Estimated Batch Yield:</span>
-                  <span className="text-base font-black text-[#0E7452] block mt-0.5">
-                    ~{estimatedDoughTotalG > 0 ? Math.round(estimatedDoughTotalG / (Number(doughGramsPerPiece) || 100)) : 0} pieces
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Pieces</span>
+                    <span className="text-2xl font-black text-[#0E7452] block mt-0.5">{totalPieces} pcs</span>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Dough Needed</span>
+                    <span className="text-2xl font-black text-stone-900 block mt-0.5">{totalDoughRequiredKg} kg</span>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Mixer Dough Yield</span>
+                    <span className="text-2xl font-black text-emerald-800 block mt-0.5">~{estimatedDoughTotalKg} kg</span>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Potential Sales Value</span>
+                    <span className="text-2xl font-black text-[#0E7452] block mt-0.5">{formatETB(totalPotentialValue)}</span>
+                  </div>
+                </div>
+
+                {/* Dough buffer indicator */}
+                <div className="flex items-center justify-between text-xs pt-1 px-1">
+                  <span className="text-stone-500 font-medium">
+                    Mixer Dough vs Total Bread Portions:
                   </span>
-                  <span className="text-[10px] text-stone-500 font-medium">
-                    from ~{((estimatedDoughTotalG) / 1000).toFixed(1)} kg mixed batch dough
+                  <span className={`font-black px-2.5 py-0.5 rounded-lg ${
+                    Number(doughDifferenceKg) >= 0 
+                      ? 'bg-emerald-200/80 text-emerald-950' 
+                      : 'bg-amber-200/80 text-amber-950'
+                  }`}>
+                    {Number(doughDifferenceKg) >= 0 
+                      ? `✓ Well Balanced (+${doughDifferenceKg} kg buffer)` 
+                      : `⚠️ ${doughDifferenceKg} kg dough variance`}
                   </span>
                 </div>
               </div>
@@ -1127,16 +1583,16 @@ export default function BakerDashboard({
                 <button
                   type="button"
                   onClick={() => jumpToStep(5)}
-                  className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+                  className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Output Pieces & Complete</span>
+                  <span>Next: Review & Complete Baking ({totalPieces} pcs)</span>
                   <ArrowRight className="w-4 h-4 text-emerald-200" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 5: PRODUCTION OUTPUT & TOTAL WEIGHT */}
+          {/* STEP 5: PRODUCTION OUTPUT & ITEMIZE TRANSFER TO CASHIER */}
           {(viewMode === 'scroll' || activeStep === 5) && (
             <div 
               ref={step5Ref}
@@ -1144,109 +1600,119 @@ export default function BakerDashboard({
                 highlightedStep === 5 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
-                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs">
+                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
                       5
                     </span>
-                    <span>When Finished: How Many Pieces Baked?</span>
+                    <span>Review & Transfer Finished Stock to Cashier:</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Enter pieces baked and send finished goods directly to cashier sales stock
+                    Verify all varieties in this batch. Stock will be immediately credited to cashiers upon completion.
                   </p>
                 </div>
-                <div className="hidden sm:flex items-center space-x-1.5 text-xs font-black text-[#064e3b] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-                  <span>{activeProduct.name}</span>
+                <div className="flex items-center space-x-2 self-start sm:self-auto">
+                  <span className="text-xs font-black text-[#064e3b] bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                    {totalPieces} Pieces Total
+                  </span>
                 </div>
               </div>
 
-              {/* Quick pieces buttons */}
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {[50, 100, 200, 300, 500, 1000].map((qty) => (
-                  <button
-                    key={qty}
-                    type="button"
-                    onClick={() => setPiecesProduced(qty)}
-                    className={`py-3 rounded-2xl font-black text-base transition-all duration-150 cursor-pointer active:scale-95 ${
-                      Number(piecesProduced) === qty
-                        ? 'bg-[#0E7452] text-white shadow-md scale-103'
-                        : 'bg-stone-100 text-stone-700 hover:bg-stone-200 hover:-translate-y-0.5'
-                    }`}
-                  >
-                    {qty} pcs
-                  </button>
-                ))}
+              {/* Itemized Batch Manifest Table */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-xs font-black text-stone-700 uppercase">
+                  <span>Itemized Batch Output Manifest ({selectedBreads.length} Varieties)</span>
+                  <span className="text-emerald-700 font-bold">Auto-Deposited to Cashier</span>
+                </div>
+
+                <div className="overflow-x-auto border border-stone-200 rounded-2xl">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-stone-50 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
+                      <tr>
+                        <th className="py-3 px-4">#</th>
+                        <th className="py-3 px-4">Bread Variety</th>
+                        <th className="py-3 px-4">Category</th>
+                        <th className="py-3 px-4 text-center">Portion</th>
+                        <th className="py-3 px-4 text-center">Pieces Baked</th>
+                        <th className="py-3 px-4 text-right">Batch Weight</th>
+                        <th className="py-3 px-4 text-right">Selling Price</th>
+                        <th className="py-3 px-4 text-right">Total Value</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100 font-medium">
+                      {selectedBreads.map((b, idx) => {
+                        const pieces = Number(b.pieces) || 0;
+                        const weight = Number(b.weight_grams) || 100;
+                        const weightKg = ((pieces * weight) / 1000).toFixed(1);
+                        const value = pieces * (Number(b.selling_price) || 10);
+                        return (
+                          <tr key={b.productId} className="hover:bg-emerald-50/40 transition-colors">
+                            <td className="py-3 px-4 font-mono font-bold text-stone-400">{idx + 1}</td>
+                            <td className="py-3 px-4 font-black text-stone-900">{b.name}</td>
+                            <td className="py-3 px-4 text-stone-500">{b.category}</td>
+                            <td className="py-3 px-4 text-center font-bold text-stone-700">{weight}g</td>
+                            <td className="py-3 px-4 text-center font-black text-[#0E7452] text-sm">{pieces} pcs</td>
+                            <td className="py-3 px-4 text-right font-bold text-stone-800">{weightKg} kg</td>
+                            <td className="py-3 px-4 text-right font-bold text-stone-600">{formatETB(b.selling_price || 10)}</td>
+                            <td className="py-3 px-4 text-right font-black text-emerald-900">{formatETB(value)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot className="bg-emerald-50/70 border-t-2 border-emerald-200 font-black text-xs text-stone-900">
+                      <tr>
+                        <td colSpan="4" className="py-3 px-4 uppercase text-[#064e3b]">Grand Batch Totals</td>
+                        <td className="py-3 px-4 text-center text-[#0E7452] text-base">{totalPieces} pcs</td>
+                        <td className="py-3 px-4 text-right text-stone-900 text-sm">{totalDoughRequiredKg} kg</td>
+                        <td className="py-3 px-4 text-right text-stone-500 text-[10px]">Avg: {formatETB(unitPrice)}</td>
+                        <td className="py-3 px-4 text-right text-[#064e3b] text-base">{formatETB(totalPotentialValue)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
 
-              <div className="bg-emerald-50/40 border-2 border-emerald-800/20 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-                
-                {/* Stepper +/- */}
-                <div className="flex items-center space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => setPiecesProduced(Math.max(0, (Number(piecesProduced) || 0) - 50))}
-                    className="w-14 h-14 rounded-2xl bg-white border border-stone-300 font-black text-3xl text-stone-800 hover:bg-stone-100 flex items-center justify-center active:scale-90 shadow-xs cursor-pointer transition-transform"
-                  >
-                    -
-                  </button>
-                  <div className="text-center min-w-[140px]">
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="0"
-                      value={piecesProduced}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === '') {
-                          setPiecesProduced('');
-                        } else {
-                          const parsed = parseInt(val, 10);
-                          setPiecesProduced(isNaN(parsed) ? '' : Math.max(0, parsed));
-                        }
-                      }}
-                      className="w-full text-center text-4xl font-black text-[#0E7452] bg-transparent border-b-2 border-[#0E7452] focus:outline-none transition-all"
-                    />
-                    <span className="text-xs font-black text-stone-500 uppercase tracking-wider block mt-1">
-                      Pieces Baked
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setPiecesProduced((Number(piecesProduced) || 0) + 50)}
-                    className="w-14 h-14 rounded-2xl bg-white border border-stone-300 font-black text-3xl text-stone-800 hover:bg-stone-100 flex items-center justify-center active:scale-90 shadow-xs cursor-pointer transition-transform"
-                  >
-                    +
-                  </button>
+              {/* Consumed Ingredients Recap Pill Box */}
+              <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-2">
+                <span className="text-[11px] font-black text-stone-500 uppercase tracking-wider block">
+                  Mixer Ingredients Consumed in This Batch:
+                </span>
+                <div className="flex flex-wrap gap-2 text-xs font-bold text-stone-800">
+                  <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">
+                    🌾 Flour: <strong className="text-emerald-900 font-black">{flourKg} kg</strong>
+                  </span>
+                  <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">
+                    🧪 Maj mix: <strong className="text-stone-900 font-black">{majMixGrams} g</strong>
+                  </span>
+                  <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">
+                    🍞 Yeast: <strong className="text-stone-900 font-black">{yeastGrams} g</strong>
+                  </span>
+                  <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">
+                    🧂 Salt: <strong className="text-stone-900 font-black">{saltGrams} g</strong>
+                  </span>
+                  {(isSameCategory(cookingCategory, 'Cookies') || isSameCategory(cookingCategory, 'Cake')) && (
+                    <>
+                      {sugarGrams && <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">🍬 Sugar: <strong>{sugarGrams} g</strong></span>}
+                      {selitGrams && <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">🌱 Selit: <strong>{selitGrams} g</strong></span>}
+                      {tekurAzmudGrams && <span className="bg-white border border-stone-200 px-3 py-1 rounded-xl shadow-2xs">🌿 Tekur azmud: <strong>{tekurAzmudGrams} g</strong></span>}
+                    </>
+                  )}
                 </div>
-
-                {/* Total Output Weight Display */}
-                <div className="text-center sm:text-right bg-white p-4 sm:p-5 rounded-2xl border border-emerald-300 shadow-xs w-full sm:w-auto min-w-0 sm:min-w-[220px]">
-                  <div className="text-xs font-extrabold text-stone-400 uppercase tracking-wider">
-                    Total Batch Output Weight
-                  </div>
-                  <div className="text-3xl font-black text-[#0E7452] mt-1">
-                    {totalWeightKg} kg
-                  </div>
-                  <div className="text-xs font-bold text-emerald-800 mt-1">
-                    {piecesProduced || 0} pcs × {doughGramsPerPiece || unitWeight}g standard dough
-                  </div>
-                </div>
-
               </div>
 
               {/* Action Button */}
               <button
                 type="button"
                 onClick={handleFinishBaking}
-                disabled={isSubmitting || Number(piecesProduced) <= 0}
-                className="w-full py-5 rounded-3xl bg-[#0E7452] hover:bg-[#0A573D] text-white font-black text-xl shadow-xl shadow-[#0E7452]/20 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center justify-center space-x-3 disabled:opacity-50"
+                disabled={isSubmitting || totalPieces <= 0}
+                className="w-full py-5 rounded-3xl bg-[#0E7452] hover:bg-[#0A573D] text-white font-black text-lg sm:text-xl shadow-xl shadow-[#0E7452]/20 transition-all hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center justify-center space-x-3 disabled:opacity-50"
               >
-                <CheckCircle2 className="w-8 h-8 text-emerald-200" />
-                <span>
+                <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-200 shrink-0" />
+                <span className="truncate">
                   {isSubmitting 
-                    ? 'Recording Production...' 
-                    : `🥖 COMPLETE BAKING & SEND TO CASHIER (${piecesProduced || 0} pcs • ${totalWeightKg} kg)`}
+                    ? 'Recording Batch & Stock...' 
+                    : `🥖 COMPLETE BAKING & TRANSFER ${totalPieces} PCS TO CASHIER`}
                 </span>
               </button>
 
@@ -1258,7 +1724,7 @@ export default function BakerDashboard({
                   className="text-stone-500 hover:text-stone-900 text-xs font-black inline-flex items-center space-x-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Dough Weight</span>
+                  <span>Back to Dough Weight & Quantities</span>
                 </button>
               </div>
             </div>
@@ -1380,7 +1846,24 @@ export default function BakerDashboard({
                       <td className="py-3 px-4 text-stone-600">
                         {b.production_date} <span className="text-stone-400">{b.production_time}</span>
                       </td>
-                      <td className="py-3 px-4 font-black text-stone-900">{b.product_name}</td>
+                      <td className="py-3 px-4 font-black text-stone-900">
+                        {b.items && b.items.length > 0 ? (
+                          <div className="space-y-1">
+                            <div className="font-black text-stone-900 flex flex-wrap gap-1 items-center">
+                              {b.items.map((it, idx) => (
+                                <span key={idx} className="bg-stone-100 text-stone-800 px-1.5 py-0.5 rounded text-[11px] font-bold">
+                                  {it.pieces_produced}x {it.product_name}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="text-[10px] text-stone-400 font-semibold">
+                              {b.items.length} varieties combined
+                            </div>
+                          </div>
+                        ) : (
+                          b.product_name
+                        )}
+                      </td>
                       <td className="py-3 px-4 text-center font-extrabold text-[#0E7452] text-sm">{b.pieces_produced}</td>
                       <td className="py-3 px-4 text-right font-black text-stone-800">
                         {b.total_weight_grams ? (b.total_weight_grams / 1000).toFixed(1) + ' kg' : `${((b.pieces_produced * 100) / 1000).toFixed(1)} kg`}
@@ -1516,6 +1999,33 @@ export default function BakerDashboard({
                 <span className="text-stone-500">Batch Output Weight:</span> <strong className="text-stone-900 block">{selectedBatchDetails.total_weight_grams ? (selectedBatchDetails.total_weight_grams / 1000).toFixed(1) + ' kg' : 'N/A'}</strong>
               </div>
             </div>
+
+            {/* Itemized Varieties Breakdown if Multi-bread batch */}
+            {selectedBatchDetails.items && selectedBatchDetails.items.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs font-black text-stone-700 uppercase">
+                  Itemized Varieties in Batch ({selectedBatchDetails.items.length}):
+                </span>
+                <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3 divide-y divide-stone-200 text-xs">
+                  {selectedBatchDetails.items.map((item, idx) => (
+                    <div key={idx} className="py-2 flex items-center justify-between">
+                      <div>
+                        <div className="font-black text-stone-900">{item.product_name}</div>
+                        <div className="text-[11px] text-stone-500 font-medium">
+                          {item.dough_weight_grams}g portion • {formatETB(item.unit_selling_price || 10)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-black text-[#0E7452] text-sm">{item.pieces_produced} pcs</div>
+                        <div className="text-[11px] text-stone-500 font-semibold">
+                          {(item.total_weight_grams / 1000).toFixed(1)} kg
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Ingredients breakdown */}
             <div className="space-y-2">

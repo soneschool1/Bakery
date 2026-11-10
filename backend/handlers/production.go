@@ -21,16 +21,17 @@ import (
 type CreateBatchRequest struct {
 	CategoryID          string                      `json:"category_id"`
 	Category            string                      `json:"category" binding:"required"`
-	ProductID           string                      `json:"product_id" binding:"required"`
-	ProductName         string                      `json:"product_name" binding:"required"`
+	ProductID           string                      `json:"product_id"`
+	ProductName         string                      `json:"product_name"`
 	BakerID             string                      `json:"baker_id" binding:"required"`
 	BakerName           string                      `json:"baker_name" binding:"required"`
-	PiecesProduced      int                         `json:"pieces_produced" binding:"required"`
+	PiecesProduced      int                         `json:"pieces_produced"`
 	TotalWeightGrams    float64                     `json:"total_weight_grams"`
-	UnitSellingPrice    float64                     `json:"unit_selling_price" binding:"required"`
+	UnitSellingPrice    float64                     `json:"unit_selling_price"`
 	IngredientsConsumed []models.IngredientConsumed `json:"ingredients_consumed" binding:"required"`
 	Remarks             string                      `json:"remarks"`
 	BranchID            string                      `json:"branch_id"`
+	Items               []models.BatchProductItem   `json:"items"`
 }
 
 func CreateProductionBatch(c *gin.Context) {
@@ -51,15 +52,49 @@ func CreateProductionBatch(c *gin.Context) {
 	dateStr := now.Format("2006-01-02")
 	timeStr := now.Format("15:04:05")
 
+	// Multi-product batch consolidation
+	var potentialValue float64
+	if len(req.Items) > 0 {
+		var calcPieces int
+		var calcWeight float64
+		var calcPotential float64
+		var names []string
+
+		for _, itm := range req.Items {
+			calcPieces += itm.PiecesProduced
+			calcWeight += itm.TotalWeightGrams
+			calcPotential += float64(itm.PiecesProduced) * itm.UnitSellingPrice
+			if itm.ProductName != "" {
+				names = append(names, itm.ProductName)
+			}
+		}
+
+		if req.PiecesProduced <= 0 {
+			req.PiecesProduced = calcPieces
+		}
+		if req.TotalWeightGrams <= 0 {
+			req.TotalWeightGrams = calcWeight
+		}
+		if req.ProductID == "" && len(req.Items) > 0 {
+			req.ProductID = req.Items[0].ProductID
+		}
+		if req.ProductName == "" && len(names) > 0 {
+			req.ProductName = strings.Join(names, " + ")
+		}
+		if req.UnitSellingPrice <= 0 && req.PiecesProduced > 0 {
+			req.UnitSellingPrice = math.Round((calcPotential/float64(req.PiecesProduced))*100) / 100
+		}
+		potentialValue = calcPotential
+	} else {
+		potentialValue = float64(req.PiecesProduced) * req.UnitSellingPrice
+	}
+
 	// 1. Generate Batch Number: BATCH-YYYYMMDD-XXX
 	dayPrefix := fmt.Sprintf("BATCH-%s", now.Format("20060102"))
 	count, _ := config.DB.ProductionBatches.CountDocuments(ctx, bson.M{
 		"batch_number": bson.M{"$regex": "^" + dayPrefix},
 	})
 	batchNumber := fmt.Sprintf("%s-%03d", dayPrefix, count+1)
-
-	// 2. Calculate potential selling value
-	potentialValue := float64(req.PiecesProduced) * req.UnitSellingPrice
 
 	// 3. Process Ingredients Consumption & Costing
 	var totalCost float64
@@ -134,39 +169,82 @@ func CreateProductionBatch(c *gin.Context) {
 	}
 
 	// 4. Update Finished Product Stock (Cashier's immediate availability)
-	// Find or create stock entry
-	stockFilter := bson.M{
-		"product_id": req.ProductID,
-	}
-	var currentStock models.FinishedProductStock
-	err := config.DB.FinishedStock.FindOne(ctx, stockFilter).Decode(&currentStock)
-	if err != nil {
-		// Create new stock entry
-		newStock := models.FinishedProductStock{
-			BranchID:          req.BranchID,
-			ProductID:         req.ProductID,
-			ProductName:       req.ProductName,
-			Category:          req.Category,
-			AvailableQuantity: req.PiecesProduced,
-			WeightGrams:       req.TotalWeightGrams / float64(req.PiecesProduced),
-			SellingPrice:      req.UnitSellingPrice,
-			LastUpdated:       now,
+	if len(req.Items) > 0 {
+		for _, itm := range req.Items {
+			if itm.ProductID == "" || itm.PiecesProduced <= 0 {
+				continue
+			}
+			stockFilter := bson.M{"product_id": itm.ProductID}
+			var currentStock models.FinishedProductStock
+			err := config.DB.FinishedStock.FindOne(ctx, stockFilter).Decode(&currentStock)
+			if err != nil {
+				wGrams := itm.DoughWeightGrams
+				if wGrams <= 0 && itm.PiecesProduced > 0 {
+					wGrams = itm.TotalWeightGrams / float64(itm.PiecesProduced)
+				}
+				newStock := models.FinishedProductStock{
+					BranchID:          req.BranchID,
+					ProductID:         itm.ProductID,
+					ProductName:       itm.ProductName,
+					Category:          itm.Category,
+					AvailableQuantity: itm.PiecesProduced,
+					WeightGrams:       wGrams,
+					SellingPrice:      itm.UnitSellingPrice,
+					LastUpdated:       now,
+				}
+				config.DB.FinishedStock.InsertOne(ctx, newStock)
+			} else {
+				baseQty := currentStock.AvailableQuantity
+				if baseQty < 0 {
+					baseQty = 0
+				}
+				newQty := baseQty + itm.PiecesProduced
+				config.DB.FinishedStock.UpdateOne(ctx, stockFilter, bson.M{
+					"$set": bson.M{
+						"available_quantity": newQty,
+						"last_updated":       now,
+						"selling_price":      itm.UnitSellingPrice,
+					},
+				})
+			}
+			sse.GlobalHub.Broadcast("stock_updated", gin.H{"product_id": itm.ProductID, "added": itm.PiecesProduced})
 		}
-		config.DB.FinishedStock.InsertOne(ctx, newStock)
 	} else {
-		// Update existing stock (ensure baseline non-negative)
-		baseQty := currentStock.AvailableQuantity
-		if baseQty < 0 {
-			baseQty = 0
+		// Single product stock update
+		stockFilter := bson.M{
+			"product_id": req.ProductID,
 		}
-		newQty := baseQty + req.PiecesProduced
-		config.DB.FinishedStock.UpdateOne(ctx, stockFilter, bson.M{
-			"$set": bson.M{
-				"available_quantity": newQty,
-				"last_updated":       now,
-				"selling_price":      req.UnitSellingPrice,
-			},
-		})
+		var currentStock models.FinishedProductStock
+		err := config.DB.FinishedStock.FindOne(ctx, stockFilter).Decode(&currentStock)
+		if err != nil {
+			// Create new stock entry
+			newStock := models.FinishedProductStock{
+				BranchID:          req.BranchID,
+				ProductID:         req.ProductID,
+				ProductName:       req.ProductName,
+				Category:          req.Category,
+				AvailableQuantity: req.PiecesProduced,
+				WeightGrams:       req.TotalWeightGrams / float64(req.PiecesProduced),
+				SellingPrice:      req.UnitSellingPrice,
+				LastUpdated:       now,
+			}
+			config.DB.FinishedStock.InsertOne(ctx, newStock)
+		} else {
+			// Update existing stock (ensure baseline non-negative)
+			baseQty := currentStock.AvailableQuantity
+			if baseQty < 0 {
+				baseQty = 0
+			}
+			newQty := baseQty + req.PiecesProduced
+			config.DB.FinishedStock.UpdateOne(ctx, stockFilter, bson.M{
+				"$set": bson.M{
+					"available_quantity": newQty,
+					"last_updated":       now,
+					"selling_price":      req.UnitSellingPrice,
+				},
+			})
+		}
+		sse.GlobalHub.Broadcast("stock_updated", gin.H{"product_id": req.ProductID, "added": req.PiecesProduced})
 	}
 
 	// 5. Update Flour Consumption Tracker (100 kg threshold)
@@ -230,6 +308,7 @@ func CreateProductionBatch(c *gin.Context) {
 		PotentialSellingValue: potentialValue,
 		CostOfIngredients:     math.Round(totalCost*100) / 100,
 		IngredientsConsumed:   req.IngredientsConsumed,
+		Items:                 req.Items,
 		Remarks:               req.Remarks,
 		Status:                "completed",
 		AuditTrail:            []models.AuditEntry{},
@@ -237,7 +316,7 @@ func CreateProductionBatch(c *gin.Context) {
 		CreatedAt:             now,
 	}
 
-	_, err = config.DB.ProductionBatches.InsertOne(ctx, batch)
+	_, err := config.DB.ProductionBatches.InsertOne(ctx, batch)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -440,15 +519,35 @@ func CancelProductionBatch(c *gin.Context) {
 	})
 
 	// 2. Reverse finished product stock (cannot go below 0)
-	var stock models.FinishedProductStock
-	if err := config.DB.FinishedStock.FindOne(ctx, bson.M{"product_id": existing.ProductID}).Decode(&stock); err == nil {
-		newQty := stock.AvailableQuantity - existing.PiecesProduced
-		if newQty < 0 {
-			newQty = 0
+	if len(existing.Items) > 0 {
+		for _, itm := range existing.Items {
+			if itm.ProductID == "" || itm.PiecesProduced <= 0 {
+				continue
+			}
+			var stock models.FinishedProductStock
+			if err := config.DB.FinishedStock.FindOne(ctx, bson.M{"product_id": itm.ProductID}).Decode(&stock); err == nil {
+				newQty := stock.AvailableQuantity - itm.PiecesProduced
+				if newQty < 0 {
+					newQty = 0
+				}
+				config.DB.FinishedStock.UpdateOne(ctx, bson.M{"product_id": itm.ProductID}, bson.M{
+					"$set": bson.M{"available_quantity": newQty, "last_updated": time.Now()},
+				})
+				sse.GlobalHub.Broadcast("stock_updated", gin.H{"product_id": itm.ProductID, "removed": itm.PiecesProduced})
+			}
 		}
-		config.DB.FinishedStock.UpdateOne(ctx, bson.M{"product_id": existing.ProductID}, bson.M{
-			"$set": bson.M{"available_quantity": newQty, "last_updated": time.Now()},
-		})
+	} else {
+		var stock models.FinishedProductStock
+		if err := config.DB.FinishedStock.FindOne(ctx, bson.M{"product_id": existing.ProductID}).Decode(&stock); err == nil {
+			newQty := stock.AvailableQuantity - existing.PiecesProduced
+			if newQty < 0 {
+				newQty = 0
+			}
+			config.DB.FinishedStock.UpdateOne(ctx, bson.M{"product_id": existing.ProductID}, bson.M{
+				"$set": bson.M{"available_quantity": newQty, "last_updated": time.Now()},
+			})
+			sse.GlobalHub.Broadcast("stock_updated", gin.H{"product_id": existing.ProductID, "removed": existing.PiecesProduced})
+		}
 	}
 
 	// 3. Reverse consumed ingredients back to raw materials

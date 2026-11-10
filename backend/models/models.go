@@ -89,6 +89,16 @@ type AuditEntry struct {
 	PreviousValues string    `bson:"previous_values" json:"previous_values"`
 }
 
+type BatchProductItem struct {
+	ProductID        string  `bson:"product_id" json:"product_id"`
+	ProductName      string  `bson:"product_name" json:"product_name"`
+	Category         string  `bson:"category" json:"category"`
+	PiecesProduced   int     `bson:"pieces_produced" json:"pieces_produced"`
+	DoughWeightGrams float64 `bson:"dough_weight_grams" json:"dough_weight_grams"`
+	TotalWeightGrams float64 `bson:"total_weight_grams" json:"total_weight_grams"`
+	UnitSellingPrice float64 `bson:"unit_selling_price" json:"unit_selling_price"`
+}
+
 type ProductionBatch struct {
 	ID                     primitive.ObjectID   `bson:"_id,omitempty" json:"id"`
 	BatchNumber            string               `bson:"batch_number" json:"batch_number"`
@@ -105,6 +115,7 @@ type ProductionBatch struct {
 	PotentialSellingValue  float64              `bson:"potential_selling_value" json:"potential_selling_value"`
 	CostOfIngredients      float64              `bson:"cost_of_ingredients" json:"cost_of_ingredients"`
 	IngredientsConsumed    []IngredientConsumed `bson:"ingredients_consumed" json:"ingredients_consumed"`
+	Items                  []BatchProductItem   `bson:"items,omitempty" json:"items,omitempty"`
 	Remarks                string               `bson:"remarks" json:"remarks"`
 	Status                 string               `bson:"status" json:"status"` // "completed", "cancelled", "edited"
 	AuditTrail             []AuditEntry         `bson:"audit_trail" json:"audit_trail"`
