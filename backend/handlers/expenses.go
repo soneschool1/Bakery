@@ -54,7 +54,7 @@ func GetVariableExpenses(c *gin.Context) {
 	}
 	defer cursor.Close(ctx)
 
-	var expenses []models.VariableExpense
+	expenses := make([]models.VariableExpense, 0)
 	if err := cursor.All(ctx, &expenses); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -270,7 +270,7 @@ func GetFixedExpenses(c *gin.Context) {
 	}
 	defer cursor.Close(ctx)
 
-	var list []models.FixedExpense
+	list := make([]models.FixedExpense, 0)
 	if err := cursor.All(ctx, &list); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -394,7 +394,7 @@ func GetFixedExpensePayments(c *gin.Context) {
 		Status       string                     `json:"status"` // "paid" or "unpaid"
 	}
 
-	var result []MonthExpenseStatus
+	result := make([]MonthExpenseStatus, 0)
 	for _, fe := range fixedExpenses {
 		st := MonthExpenseStatus{
 			FixedExpense: fe,

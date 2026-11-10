@@ -117,27 +117,27 @@ export default function App() {
         api.getStockChecks().catch(() => []),
       ]);
 
-      setAllUsers(usersRes);
-      if (usersRes.length > 0 && authUser && !currentUser?.id) {
+      setAllUsers(Array.isArray(usersRes) ? usersRes : []);
+      if (Array.isArray(usersRes) && usersRes.length > 0 && authUser && !currentUser?.id) {
         const matched = usersRes.find(u => u.username === authUser.username) || authUser;
         setCurrentUser(matched);
       }
-      setProducts(productsRes);
-      setRawMaterials(materialsRes);
-      setFinishedStock(stockRes);
-      setBatches(batchesRes);
-      setBranches(branchesRes);
-      setTransfers(transfersRes);
-      setClosings(closingsRes);
-      setClosingSummary(summaryRes);
-      setDeposits(depositsRes);
-      setVariableExpenses(varExpRes);
-      setFixedExpenses(fixExpRes);
-      setFlourTracker(flourRes);
-      setSuggestions(sugRes);
-      setNotifications(notifRes);
-      setAuditLogs(auditRes);
-      setStockChecks(stockChecksRes);
+      setProducts(Array.isArray(productsRes) ? productsRes : []);
+      setRawMaterials(Array.isArray(materialsRes) ? materialsRes : []);
+      setFinishedStock(Array.isArray(stockRes) ? stockRes : []);
+      setBatches(Array.isArray(batchesRes) ? batchesRes : []);
+      setBranches(Array.isArray(branchesRes) ? branchesRes : []);
+      setTransfers(Array.isArray(transfersRes) ? transfersRes : []);
+      setClosings(Array.isArray(closingsRes) ? closingsRes : []);
+      setClosingSummary(summaryRes || {});
+      setDeposits(Array.isArray(depositsRes) ? depositsRes : []);
+      setVariableExpenses(Array.isArray(varExpRes) ? varExpRes : []);
+      setFixedExpenses(Array.isArray(fixExpRes) ? fixExpRes : []);
+      setFlourTracker(flourRes || {});
+      setSuggestions(Array.isArray(sugRes) ? sugRes : []);
+      setNotifications(Array.isArray(notifRes) ? notifRes : []);
+      setAuditLogs(Array.isArray(auditRes) ? auditRes : []);
+      setStockChecks(Array.isArray(stockChecksRes) ? stockChecksRes : []);
 
       loadDashboard();
     } catch (err) {

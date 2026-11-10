@@ -3,7 +3,8 @@ import { ShieldAlert, Clock, User } from 'lucide-react';
 import { formatDateTime } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
 
-export default function AuditLogViewer({ auditLogs }) {
+export default function AuditLogViewer({ auditLogs = [] }) {
+  const safeLogs = Array.isArray(auditLogs) ? auditLogs : [];
   const { t } = useTranslation();
 
   return (
@@ -16,7 +17,7 @@ export default function AuditLogViewer({ auditLogs }) {
           </h2>
         </div>
         <span className="text-xs text-stone-500">
-          {t('admin.auditTrail.loggedEvents', '{count} logged events').replace('{count}', auditLogs.length)}
+          {t('admin.auditTrail.loggedEvents', '{count} logged events').replace('{count}', safeLogs.length)}
         </span>
       </div>
 
@@ -32,14 +33,14 @@ export default function AuditLogViewer({ auditLogs }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {auditLogs.length === 0 ? (
+            {safeLogs.length === 0 ? (
               <tr>
                 <td colSpan="5" className="py-10 text-center text-stone-400">
                   {t('admin.auditTrail.noEntries', 'No audit log entries recorded yet.')}
                 </td>
               </tr>
             ) : (
-              auditLogs.map((log) => (
+              safeLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-amber-50/20">
                   <td className="py-3 px-4 text-stone-500 font-mono text-[11px] whitespace-nowrap">
                     {formatDateTime(log.created_at)}

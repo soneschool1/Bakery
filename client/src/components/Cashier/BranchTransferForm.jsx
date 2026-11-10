@@ -911,7 +911,7 @@ export default function BranchTransferForm({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Bole Medhanialem Branch"
+                  placeholder="e.g. Kella Branch"
                   value={branchFormData.name}
                   onChange={(e) => setBranchFormData({ ...branchFormData, name: e.target.value })}
                   className="w-full text-xs font-bold bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900 focus:bg-white focus:outline-none"

@@ -5,7 +5,7 @@ import { formatETB } from '../../utils/formatters';
 import { useTranslation } from '../../i18n/LanguageContext';
 
 export default function FixedExpenseManager({ 
-  fixedExpenses, 
+  fixedExpenses = [], 
   onAddFixedExpense, 
   onUpdateFixedExpense, 
   onDeleteFixedExpense,
@@ -31,7 +31,7 @@ export default function FixedExpenseManager({
     setIsLoading(true);
     try {
       const res = await api.getFixedExpensePayments(currentMonth);
-      setMonthStatuses(res.items || []);
+      setMonthStatuses(Array.isArray(res?.items) ? res.items : []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -48,7 +48,7 @@ export default function FixedExpenseManager({
         amount: item.fixed_expense.monthly_amount,
         status: newStatus,
         payment_method: 'bank',
-        paid_by: admin.full_name || 'Abebe Kebede',
+        paid_by: admin?.full_name || 'Abebe Kebede',
         reference: `MTH-${currentMonth}`,
         remarks: `Marked ${newStatus} by admin`,
       });
@@ -75,7 +75,8 @@ export default function FixedExpenseManager({
     setAmount('');
   }
 
-  const totalMonthlyCommitment = fixedExpenses.reduce((sum, f) => sum + f.monthly_amount, 0);
+  const safeFixed = Array.isArray(fixedExpenses) ? fixedExpenses : [];
+  const totalMonthlyCommitment = safeFixed.reduce((sum, f) => sum + (Number(f?.monthly_amount) || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -143,7 +144,8 @@ export default function FixedExpenseManager({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {monthStatuses.map((item) => {
+              {(Array.isArray(monthStatuses) ? monthStatuses : []).map((item) => {
+                if (!item || !item.fixed_expense) return null;
                 const isPaid = item.status === 'paid';
                 return (
                   <tr key={item.fixed_expense.id} className="hover:bg-amber-50/20">

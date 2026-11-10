@@ -68,6 +68,7 @@ export const api = {
   getBranches: () => request('/branches'),
   createBranch: (branch) => request('/branches', { method: 'POST', body: branch }),
   updateBranch: (id, branch) => request(`/branches/${id}`, { method: 'PUT', body: branch }),
+  deleteBranch: (id) => request(`/branches/${id}`, { method: 'DELETE' }),
   getBranchTransfers: (params = '') => request(`/branches/transfers${params ? '?' + params : ''}`),
   createBranchTransfer: (transfer) => request('/branches/transfers', { method: 'POST', body: transfer }),
   receiveBranchTransfer: (id, data) => request(`/branches/transfers/${id}/receive`, { method: 'POST', body: data }),

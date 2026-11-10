@@ -98,6 +98,8 @@ func UpdateBranch(c *gin.Context) {
 			"location":       req.Location,
 			"contact_person": req.ContactPerson,
 			"phone":          req.Phone,
+			"active":         req.Active,
+			"is_main":        req.IsMain,
 		},
 	}
 
@@ -108,6 +110,26 @@ func UpdateBranch(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Branch updated successfully"})
+}
+
+func DeleteBranch(c *gin.Context) {
+	idStr := c.Param("id")
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid branch ID"})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = config.DB.Branches.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"active": false}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Branch deactivated successfully"})
 }
 
 func CreateBranchTransfer(c *gin.Context) {

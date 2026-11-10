@@ -303,7 +303,7 @@ export default function SuggestionsConfigurator({
 
   // Filtered list
   const filteredSuggestions = useMemo(() => {
-    return suggestions.filter(s => {
+    return (Array.isArray(suggestions) ? suggestions : []).filter(s => {
       // Role filter
       if (roleFilter === 'baker' && s.role_target !== 'baker') return false;
       if (roleFilter === 'cashier_sale' && (s.role_target !== 'cashier' || s.category !== 'sales_combo')) return false;

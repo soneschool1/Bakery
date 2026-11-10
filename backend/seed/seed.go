@@ -32,9 +32,7 @@ func SeedDatabase(db *config.Database) {
 
 	// 2. Branches
 	mainBranchID := primitive.NewObjectID()
-	boleBranchID := primitive.NewObjectID()
-	piassaBranchID := primitive.NewObjectID()
-	kazanchisBranchID := primitive.NewObjectID()
+	kellaBranchID := primitive.NewObjectID()
 
 	branches := []interface{}{
 		models.Branch{
@@ -48,32 +46,12 @@ func SeedDatabase(db *config.Database) {
 			CreatedAt:     time.Now(),
 		},
 		models.Branch{
-			ID:            boleBranchID,
-			Name:          "Bole Atlas Branch",
+			ID:            kellaBranchID,
+			Name:          "Kella Branch",
 			IsMain:        false,
-			Location:      "Atlas Hotel Area, Bole",
-			ContactPerson: "Solomon Tadesse",
-			Phone:         "+251922334455",
-			Active:        true,
-			CreatedAt:     time.Now(),
-		},
-		models.Branch{
-			ID:            piassaBranchID,
-			Name:          "Piassa Branch",
-			IsMain:        false,
-			Location:      "Churchill Avenue, Piassa",
-			ContactPerson: "Marta Girma",
-			Phone:         "+251933445566",
-			Active:        true,
-			CreatedAt:     time.Now(),
-		},
-		models.Branch{
-			ID:            kazanchisBranchID,
-			Name:          "Kazanchis Branch",
-			IsMain:        false,
-			Location:      "Near UNECA, Kazanchis",
-			ContactPerson: "Yonas Bekele",
-			Phone:         "+251944556677",
+			Location:      "Kella",
+			ContactPerson: "GETE",
+			Phone:         "0912345678",
 			Active:        true,
 			CreatedAt:     time.Now(),
 		},
@@ -559,7 +537,7 @@ func SeedDatabase(db *config.Database) {
 			Title:        "Branch Transfer Transport / Bajaj (300 ETB)",
 			Payload: map[string]interface{}{
 				"category":    "Transportation for sending bread to other branches",
-				"description": "Bajaj delivery to Bole Atlas branch",
+				"description": "Bajaj delivery to Kella branch",
 				"amount":      300.0,
 			},
 			DisplayOrder: 2,

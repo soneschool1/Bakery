@@ -53,7 +53,9 @@ export default function ExpenseControlCenter({
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [variableList, setVariableList] = useState(expenses);
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+  const safeFixedExpenses = Array.isArray(fixedExpenses) ? fixedExpenses : [];
+  const [variableList, setVariableList] = useState(safeExpenses);
   const [isLoading, setIsLoading] = useState(false);
 
   // Modals
@@ -67,7 +69,15 @@ export default function ExpenseControlCenter({
   // Fixed Expenses State
   const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
   const [monthStatuses, setMonthStatuses] = useState([]);
-  const [fixedList, setFixedList] = useState(fixedExpenses);
+  const [fixedList, setFixedList] = useState(safeFixedExpenses);
+
+  useEffect(() => {
+    if (Array.isArray(expenses)) setVariableList(expenses);
+  }, [expenses]);
+
+  useEffect(() => {
+    if (Array.isArray(fixedExpenses)) setFixedList(fixedExpenses);
+  }, [fixedExpenses]);
   const [showAddFixedModal, setShowAddFixedModal] = useState(false);
   const [editingFixedExpense, setEditingFixedExpense] = useState(null);
 
@@ -92,7 +102,7 @@ export default function ExpenseControlCenter({
   async function loadMonthStatuses() {
     try {
       const res = await api.getFixedExpensePayments(selectedMonth);
-      setMonthStatuses(res.items || []);
+      setMonthStatuses(Array.isArray(res?.items) ? res.items : []);
     } catch (err) {
       console.error('Failed to load fixed expense payments:', err);
     }
@@ -131,7 +141,8 @@ export default function ExpenseControlCenter({
 
   // Filtered variable expenses
   const filteredVariableExpenses = useMemo(() => {
-    return variableList.filter((exp) => {
+    const list = Array.isArray(variableList) ? variableList : [];
+    return list.filter((exp) => {
       // Payment filter
       if (paymentFilter !== 'all' && exp.payment_method !== paymentFilter) {
         return false;
@@ -174,13 +185,15 @@ export default function ExpenseControlCenter({
 
   // Fixed monthly commitments
   const totalMonthlyCommitment = useMemo(() => {
-    return fixedList.reduce((sum, f) => sum + (f.monthly_amount || 0), 0);
+    const list = Array.isArray(fixedList) ? fixedList : [];
+    return list.reduce((sum, f) => sum + (Number(f?.monthly_amount) || 0), 0);
   }, [fixedList]);
 
   const paidMonthlyAmount = useMemo(() => {
-    return monthStatuses
-      .filter(m => m.status === 'paid')
-      .reduce((sum, m) => sum + (m.fixed_expense?.monthly_amount || 0), 0);
+    const list = Array.isArray(monthStatuses) ? monthStatuses : [];
+    return list
+      .filter(m => m && m.status === 'paid')
+      .reduce((sum, m) => sum + (Number(m?.fixed_expense?.monthly_amount) || 0), 0);
   }, [monthStatuses]);
 
   const pendingMonthlyAmount = totalMonthlyCommitment - paidMonthlyAmount;
@@ -188,7 +201,7 @@ export default function ExpenseControlCenter({
   // Category breakdown for analytics
   const categoryBreakdown = useMemo(() => {
     const map = {};
-    variableList.forEach(e => {
+    (Array.isArray(variableList) ? variableList : []).forEach(e => {
       const cat = e.expense_category || 'Other';
       if (!map[cat]) {
         map[cat] = { category: cat, total: 0, count: 0 };
@@ -960,7 +973,8 @@ export default function ExpenseControlCenter({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {monthStatuses.map((item) => {
+                {(Array.isArray(monthStatuses) ? monthStatuses : []).map((item) => {
+                  if (!item) return null;
                   const isPaid = item.status === 'paid';
                   return (
                     <tr key={item.fixed_expense?.id} className="hover:bg-gray-50/50 transition-colors">

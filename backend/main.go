@@ -98,6 +98,7 @@ func main() {
 		api.GET("/branches", handlers.GetBranches)
 		api.POST("/branches", handlers.CreateBranch)
 		api.PUT("/branches/:id", handlers.UpdateBranch)
+		api.DELETE("/branches/:id", handlers.DeleteBranch)
 		api.GET("/branches/transfers", handlers.GetBranchTransfers)
 		api.POST("/branches/transfers", handlers.CreateBranchTransfer)
 		api.POST("/branches/transfers/:id/receive", handlers.ReceiveBranchTransfer)
