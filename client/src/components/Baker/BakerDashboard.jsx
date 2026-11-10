@@ -955,8 +955,6 @@ export default function BakerDashboard({
                             </span>
                             <div className="flex items-center space-x-2 text-xs font-bold text-stone-500 mt-0.5">
                               <span>{p.category}</span>
-                              <span>•</span>
-                              <span className="text-[#0E7452] font-black">{formatETB(p.selling_price || 10)}</span>
                             </div>
                           </div>
 
@@ -1364,8 +1362,6 @@ export default function BakerDashboard({
                               </span>
                             </div>
                             <div className="flex items-center space-x-2 text-xs font-semibold text-stone-500 mt-0.5">
-                              <span>Cashier Price: <strong className="text-[#0E7452]">{formatETB(bread.selling_price || 10)}</strong></span>
-                              <span>•</span>
                               <span>Standard: <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
                             </div>
                           </div>
@@ -1374,9 +1370,9 @@ export default function BakerDashboard({
                         <div className="flex items-center space-x-3 self-end sm:self-auto">
                           {/* Variety subtotal preview badge */}
                           <div className="text-right text-xs bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
-                            <span className="text-stone-400 font-bold block text-[10px] uppercase">Dough & Value</span>
+                            <span className="text-stone-400 font-bold block text-[10px] uppercase">Batch Dough</span>
                             <span className="font-black text-[#0E7452]">
-                              {breadTotalKg} kg • {formatETB(breadValue)}
+                              {breadTotalKg} kg
                             </span>
                           </div>
 
@@ -1534,22 +1530,18 @@ export default function BakerDashboard({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
                     <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Pieces</span>
                     <span className="text-2xl font-black text-[#0E7452] block mt-0.5">{totalPieces} pcs</span>
                   </div>
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
                     <span className="text-[11px] font-bold text-stone-400 block uppercase">Total Dough Needed</span>
                     <span className="text-2xl font-black text-stone-900 block mt-0.5">{totalDoughRequiredKg} kg</span>
                   </div>
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200">
                     <span className="text-[11px] font-bold text-stone-400 block uppercase">Mixer Dough Yield</span>
                     <span className="text-2xl font-black text-emerald-800 block mt-0.5">~{estimatedDoughTotalKg} kg</span>
-                  </div>
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200">
-                    <span className="text-[11px] font-bold text-stone-400 block uppercase">Potential Sales Value</span>
-                    <span className="text-2xl font-black text-[#0E7452] block mt-0.5">{formatETB(totalPotentialValue)}</span>
                   </div>
                 </div>
 
@@ -1635,9 +1627,7 @@ export default function BakerDashboard({
                         <th className="py-3 px-4">Category</th>
                         <th className="py-3 px-4 text-center">Portion</th>
                         <th className="py-3 px-4 text-center">Pieces Baked</th>
-                        <th className="py-3 px-4 text-right">Batch Weight</th>
-                        <th className="py-3 px-4 text-right">Selling Price</th>
-                        <th className="py-3 px-4 text-right">Total Value</th>
+                        <th className="py-3 px-4 text-right">Batch Dough Weight</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100 font-medium">
@@ -1645,7 +1635,6 @@ export default function BakerDashboard({
                         const pieces = Number(b.pieces) || 0;
                         const weight = Number(b.weight_grams) || 100;
                         const weightKg = ((pieces * weight) / 1000).toFixed(1);
-                        const value = pieces * (Number(b.selling_price) || 10);
                         return (
                           <tr key={b.productId} className="hover:bg-emerald-50/40 transition-colors">
                             <td className="py-3 px-4 font-mono font-bold text-stone-400">{idx + 1}</td>
@@ -1653,9 +1642,7 @@ export default function BakerDashboard({
                             <td className="py-3 px-4 text-stone-500">{b.category}</td>
                             <td className="py-3 px-4 text-center font-bold text-stone-700">{weight}g</td>
                             <td className="py-3 px-4 text-center font-black text-[#0E7452] text-sm">{pieces} pcs</td>
-                            <td className="py-3 px-4 text-right font-bold text-stone-800">{weightKg} kg</td>
-                            <td className="py-3 px-4 text-right font-bold text-stone-600">{formatETB(b.selling_price || 10)}</td>
-                            <td className="py-3 px-4 text-right font-black text-emerald-900">{formatETB(value)}</td>
+                            <td className="py-3 px-4 text-right font-black text-stone-800">{weightKg} kg</td>
                           </tr>
                         );
                       })}
@@ -1665,8 +1652,6 @@ export default function BakerDashboard({
                         <td colSpan="4" className="py-3 px-4 uppercase text-[#064e3b]">Grand Batch Totals</td>
                         <td className="py-3 px-4 text-center text-[#0E7452] text-base">{totalPieces} pcs</td>
                         <td className="py-3 px-4 text-right text-stone-900 text-sm">{totalDoughRequiredKg} kg</td>
-                        <td className="py-3 px-4 text-right text-stone-500 text-[10px]">Avg: {formatETB(unitPrice)}</td>
-                        <td className="py-3 px-4 text-right text-[#064e3b] text-base">{formatETB(totalPotentialValue)}</td>
                       </tr>
                     </tfoot>
                   </table>
@@ -2012,7 +1997,7 @@ export default function BakerDashboard({
                       <div>
                         <div className="font-black text-stone-900">{item.product_name}</div>
                         <div className="text-[11px] text-stone-500 font-medium">
-                          {item.dough_weight_grams}g portion • {formatETB(item.unit_selling_price || 10)}
+                          {item.dough_weight_grams}g portion
                         </div>
                       </div>
                       <div className="text-right">

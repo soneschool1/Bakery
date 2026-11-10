@@ -521,14 +521,12 @@ export default function StockControlCenter({
                     <th className="py-3 px-4 text-right">{t('admin.stockControlCenter.colAvailablePcs', 'Available Stock')}</th>
                     <th className="py-3 px-4 text-right">Unit Weight (g)</th>
                     <th className="py-3 px-4 text-right">{t('admin.stockControlCenter.colRetailPrice', 'Selling Price (ETB)')}</th>
-                    <th className="py-3 px-4 text-right">{t('admin.stockControlCenter.colTotalRetail', 'Potential Sales Value')}</th>
                     <th className="py-3 px-4 text-right">{t('admin.stockControlCenter.colAdminActions', 'Admin Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
                   {filteredFinished.map((item) => {
                     const branchName = branches.find(b => b.id === item.branch_id)?.name || item.branch_id || 'Main Branch';
-                    const potentialVal = item.available_quantity * (item.selling_price || 0);
 
                     return (
                       <tr key={item.id} className="hover:bg-stone-50">
@@ -551,7 +549,6 @@ export default function StockControlCenter({
                         </td>
                         <td className="py-3.5 px-4 text-right font-semibold text-stone-600">{item.weight_grams} g</td>
                         <td className="py-3.5 px-4 text-right font-black text-stone-900">{formatETB(item.selling_price)}</td>
-                        <td className="py-3.5 px-4 text-right font-black text-[#064e3b]">{formatETB(potentialVal)}</td>
                         <td className="py-3.5 px-4 text-right">
                           <button
                             onClick={() => {
