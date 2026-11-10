@@ -367,10 +367,10 @@ export default function SuggestionsConfigurator({
             <div>
               <div className="text-[11px] font-bold text-amber-800 uppercase tracking-wider flex items-center space-x-1.5">
                 <ChefHat className="w-4 h-4 text-amber-600" />
-                <span>Baker Recipes</span>
+                <span>{t('admin.suggestionsConfigurator.bakerPresetsTitle', 'Baker Recipes')}</span>
               </div>
               <div className="text-2xl font-black text-amber-950 mt-1">{bakerCount}</div>
-              <div className="text-[11px] text-amber-700/80 mt-0.5">Kitchen dough & baking presets</div>
+              <div className="text-[11px] text-amber-700/80 mt-0.5">{t('admin.suggestionsConfigurator.bakerPresetsDesc', 'Kitchen dough & baking presets')}</div>
             </div>
           </div>
 
@@ -378,10 +378,10 @@ export default function SuggestionsConfigurator({
             <div>
               <div className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider flex items-center space-x-1.5">
                 <ShoppingBag className="w-4 h-4 text-emerald-600" />
-                <span>Cashier Sales Combos</span>
+                <span>{t('admin.suggestionsConfigurator.cashierPresetsTitle', 'Cashier Sales Combos')}</span>
               </div>
               <div className="text-2xl font-black text-emerald-950 mt-1">{cashierSaleCount}</div>
-              <div className="text-[11px] text-emerald-700/80 mt-0.5">1-tap multi-bread checkout packs</div>
+              <div className="text-[11px] text-emerald-700/80 mt-0.5">{t('admin.suggestionsConfigurator.cashierPresetsDesc', '1-tap multi-bread checkout packs')}</div>
             </div>
           </div>
 
@@ -389,10 +389,10 @@ export default function SuggestionsConfigurator({
             <div>
               <div className="text-[11px] font-bold text-sky-800 uppercase tracking-wider flex items-center space-x-1.5">
                 <Receipt className="w-4 h-4 text-sky-600" />
-                <span>Cashier Expense Buttons</span>
+                <span>{t('admin.suggestionsConfigurator.cashierExpensesSales', 'Cashier Expense Buttons')}</span>
               </div>
               <div className="text-2xl font-black text-sky-950 mt-1">{cashierExpenseCount}</div>
-              <div className="text-[11px] text-sky-700/80 mt-0.5">Staff food, bajaj & daily costs</div>
+              <div className="text-[11px] text-sky-700/80 mt-0.5">{t('admin.suggestionsConfigurator.cashierExpensesDesc', 'Staff food, bajaj & daily costs')}</div>
             </div>
           </div>
 
@@ -413,7 +413,7 @@ export default function SuggestionsConfigurator({
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            All Shortcuts ({suggestions.length})
+            {t('admin.suggestionsConfigurator.allShortcuts', 'All Shortcuts')} ({suggestions.length})
           </button>
           <button
             type="button"
@@ -425,7 +425,7 @@ export default function SuggestionsConfigurator({
             }`}
           >
             <ChefHat className="w-3.5 h-3.5" />
-            <span>🥖 Baker Recipes ({bakerCount})</span>
+            <span>🥖 {t('admin.suggestionsConfigurator.bakerPresetsTitle', 'Baker Recipes')} ({bakerCount})</span>
           </button>
           <button
             type="button"
@@ -437,7 +437,7 @@ export default function SuggestionsConfigurator({
             }`}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>🛒 POS Sales ({cashierSaleCount})</span>
+            <span>🛒 {t('admin.suggestionsConfigurator.posSales', 'POS Sales')} ({cashierSaleCount})</span>
           </button>
           <button
             type="button"

@@ -12,6 +12,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  html[lang="am"] body,
+  body.font-amharic {
+    font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
   /* Fluid responsive media & images */
   img, svg, video, canvas {
     max-width: 100%;
@@ -25,6 +31,17 @@
   h1, h2, h3, h4, h5, h6, p, label, .break-text {
     overflow-wrap: break-word;
     word-break: break-word;
+  }
+  /* Prevent clipping on buttons, badges, and table cells when switching between scripts */
+  button, th, td, .text-wrap-safe {
+    overflow-wrap: break-word;
+  }
+  html[lang="am"] button,
+  html[lang="am"] input,
+  html[lang="am"] select,
+  html[lang="am"] th,
+  html[lang="am"] td {
+    line-height: 1.5;
   }
 }
 

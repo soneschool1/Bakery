@@ -1844,7 +1844,7 @@ export default function DailySalesViewer({
                 )}
               </p>
               <div className="border-t border-rose-200 pt-2 flex items-center justify-between text-xs font-bold text-rose-900">
-                <span>Total Refund / Void Amount:</span>
+                <span>{t('admin.dailySalesViewer.totalRefundAmount', 'Total Refund / Void Amount:')}</span>
                 <span className="font-black text-sm">{formatETB(deletingSale.total_amount)}</span>
               </div>
             </div>
@@ -1852,7 +1852,7 @@ export default function DailySalesViewer({
             {/* Sold Items Summary to restore */}
             <div className="space-y-1.5">
               <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                Items to restore to shelf stock:
+                {t('admin.dailySalesViewer.itemsToRestore', 'Items to restore to shelf stock:')}
               </span>
               <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
                 {deletingSale.items?.map((it, idx) => (
@@ -1926,7 +1926,7 @@ export default function DailySalesViewer({
                     Audit Log: Receipt #{viewingAuditSale.receipt_number}
                   </h3>
                   <p className="text-xs text-gray-500 font-medium">
-                    Modification history and supervisor reasons
+                    {t('admin.dailySalesViewer.auditLogSubtitle', 'Modification history and supervisor reasons')}
                   </p>
                 </div>
               </div>

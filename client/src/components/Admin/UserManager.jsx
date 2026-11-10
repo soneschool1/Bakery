@@ -272,23 +272,23 @@ export default function UserManager({
       {/* 2. Top Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
-          <div className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Total Users</div>
+          <div className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">{t('admin.userManager.totalUsers', 'Total Users')}</div>
           <div className="text-2xl font-black text-stone-900 mt-1">{stats.total}</div>
         </div>
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
-          <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Active Accounts</div>
+          <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">{t('admin.userManager.activeAccounts', 'Active Accounts')}</div>
           <div className="text-2xl font-black text-emerald-800 mt-1">{stats.active}</div>
         </div>
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
-          <div className="text-[11px] font-bold text-stone-700 uppercase tracking-wider">Administrators</div>
+          <div className="text-[11px] font-bold text-stone-700 uppercase tracking-wider">{t('admin.userManager.admins', 'Administrators')}</div>
           <div className="text-2xl font-black text-stone-900 mt-1">{stats.admins}</div>
         </div>
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
-          <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Bakers</div>
+          <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">{t('admin.userManager.bakers', 'Bakers')}</div>
           <div className="text-2xl font-black text-amber-900 mt-1">{stats.bakers}</div>
         </div>
         <div className="bg-white border border-stone-200 p-4 rounded-2xl shadow-2xs">
-          <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Cashiers</div>
+          <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">{t('admin.userManager.cashiers', 'Cashiers')}</div>
           <div className="text-2xl font-black text-emerald-900 mt-1">{stats.cashiers}</div>
         </div>
       </div>
@@ -299,7 +299,7 @@ export default function UserManager({
           <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by name, username, or phone..."
+            placeholder={t('admin.userManager.searchPlaceholder', 'Search by name, username, or phone...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold text-stone-800 focus:bg-white focus:outline-none focus:border-[#064e3b]"
@@ -309,18 +309,23 @@ export default function UserManager({
         <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto scrollbar-none pb-1 sm:pb-0">
           {/* Role Filter Pills */}
           <div className="flex items-center space-x-1 bg-stone-100 p-1 rounded-xl">
-            {['all', 'admin', 'baker', 'cashier'].map((r) => (
+            {[
+              { id: 'all', label: t('common.all', 'All Roles') },
+              { id: 'admin', label: t('admin.userManager.roleAdmin', 'Admin') },
+              { id: 'baker', label: t('admin.userManager.roleBaker', 'Baker') },
+              { id: 'cashier', label: t('admin.userManager.roleCashier', 'Cashier') }
+            ].map((r) => (
               <button
-                key={r}
+                key={r.id}
                 type="button"
-                onClick={() => setRoleFilter(r)}
+                onClick={() => setRoleFilter(r.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-black capitalize transition-all cursor-pointer ${
-                  roleFilter === r
+                  roleFilter === r.id
                     ? 'bg-[#064e3b] text-white shadow-2xs'
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                {r === 'all' ? 'All Roles' : r}
+                {r.label}
               </button>
             ))}
           </div>
@@ -331,9 +336,9 @@ export default function UserManager({
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 cursor-pointer"
           >
-            <option value="all">All Status</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Deactivated Only</option>
+            <option value="all">{t('common.all', 'All Status')}</option>
+            <option value="active">{t('common.active', 'Active Only')}</option>
+            <option value="inactive">{t('common.inactive', 'Deactivated Only')}</option>
           </select>
         </div>
       </div>

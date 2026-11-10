@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Package, Plus, Edit2, AlertTriangle, Scale, Trash2, CheckCircle2 } from 'lucide-react';
 import { formatETB } from '../../utils/formatters';
+import { useTranslation } from '../../i18n';
 
 export default function InventoryManager({ 
   rawMaterials, 
@@ -10,6 +11,7 @@ export default function InventoryManager({
   onAdjustStock, 
   admin 
 }) {
+  const { t } = useTranslation();
   const [showAddModal, setShowAddModal] = useState(false);
   const [adjustModalMaterial, setAdjustModalMaterial] = useState(null);
   const [newStockQty, setNewStockQty] = useState('');
@@ -81,11 +83,11 @@ export default function InventoryManager({
           <div className="flex items-center space-x-2">
             <Package className="w-5 h-5 text-[#064e3b]" />
             <h2 className="text-base font-black text-stone-900">
-              Raw Materials & Packaging Inventory Management
+              {t('admin.inventoryManager.title', 'Raw Materials & Packaging Inventory Management')}
             </h2>
           </div>
           <p className="text-xs text-stone-500 mt-0.5">
-            Track ingredients (Flour, Yeast, Maj mix, Salt, Sugar, Selit, Tekur azmud, Plastic & Paper bags).
+            {t('admin.inventoryManager.subtitle', 'Track ingredients (Flour, Yeast, Maj mix, Salt, Sugar, Selit, Tekur azmud, Plastic & Paper bags).')}
           </p>
         </div>
 
@@ -94,7 +96,7 @@ export default function InventoryManager({
           className="bg-[#064e3b] hover:bg-emerald-900 text-white font-black text-xs px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer"
         >
           <Plus className="w-4 h-4 text-emerald-300" />
-          <span>Add New Material / Packaging</span>
+          <span>{t('admin.inventoryManager.addBtn', 'Add New Material / Packaging')}</span>
         </button>
       </div>
 
@@ -104,14 +106,14 @@ export default function InventoryManager({
           <table className="w-full text-left text-xs">
             <thead className="bg-stone-100 text-stone-600 font-bold uppercase text-[10px] border-b border-stone-200">
               <tr>
-                <th className="py-3 px-4">Item Name</th>
-                <th className="py-3 px-4">Category</th>
-                <th className="py-3 px-4 text-right">Current Stock</th>
-                <th className="py-3 px-4 text-center">Unit</th>
-                <th className="py-3 px-4 text-right">Min Stock</th>
-                <th className="py-3 px-4 text-right">Purchase Price (ETB)</th>
-                <th className="py-3 px-4">Supplier</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4">{t('admin.inventoryManager.colItemName', 'Item Name')}</th>
+                <th className="py-3 px-4">{t('admin.inventoryManager.colCategory', 'Category')}</th>
+                <th className="py-3 px-4 text-right">{t('admin.inventoryManager.colCurrentStock', 'Current Stock')}</th>
+                <th className="py-3 px-4 text-center">{t('admin.inventoryManager.colUnit', 'Unit')}</th>
+                <th className="py-3 px-4 text-right">{t('admin.inventoryManager.colMinStock', 'Min Stock')}</th>
+                <th className="py-3 px-4 text-right">{t('admin.inventoryManager.colUnitCost', 'Purchase Price (ETB)')}</th>
+                <th className="py-3 px-4">{t('admin.inventoryManager.colSupplier', 'Supplier')}</th>
+                <th className="py-3 px-4 text-right">{t('admin.inventoryManager.colActions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">

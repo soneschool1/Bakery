@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, CheckCircle, Cookie, Scale } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function CookieProductionForm({ 
   baker, 
@@ -8,6 +9,7 @@ export default function CookieProductionForm({
   onSubmit, 
   isSubmitting 
 }) {
+  const { t } = useTranslation();
   const cookieProducts = products.filter(p => p.category === 'Cookies' && p.active);
 
   const [selectedProduct, setSelectedProduct] = useState(cookieProducts[0] || null);
@@ -93,7 +95,7 @@ export default function CookieProductionForm({
         <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4">
           <div className="flex items-center space-x-2 mb-2 text-xs font-bold text-amber-900">
             <Sparkles className="w-4 h-4 text-amber-600" />
-            <span>COOKIE RECIPE PRESETS:</span>
+            <span>{t('baker.cookiePresetsHeader', 'COOKIE RECIPE PRESETS:')}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((sug) => (
@@ -113,7 +115,7 @@ export default function CookieProductionForm({
       {/* Cookie Product Selection */}
       <div>
         <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
-          Select Cookie Variety
+          {t('baker.selectCookieSpec', 'Select Cookie Variety')}
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {cookieProducts.map((prod) => {
@@ -134,7 +136,7 @@ export default function CookieProductionForm({
                 )}
                 <div className="font-extrabold text-sm text-stone-900">{prod.name}</div>
                 <div className="mt-2 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-stone-500">Standard Dough</span>
+                  <span className="font-semibold text-stone-500">{t('common.standardDough', 'Standard Dough')}</span>
                   <span className="font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-lg">
                     {prod.weight_grams}g
                   </span>
@@ -149,7 +151,7 @@ export default function CookieProductionForm({
       <div className="bg-stone-50/80 border border-stone-200 rounded-3xl p-5">
         <h3 className="text-xs font-extrabold text-stone-900 uppercase tracking-wider mb-4 flex items-center space-x-2">
           <Scale className="w-4 h-4 text-amber-600" />
-          <span>Cookies Ingredients Consumption</span>
+          <span>{t('baker.cookieIngredients', 'Cookies Ingredients Consumption')}</span>
         </h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

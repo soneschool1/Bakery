@@ -676,7 +676,7 @@ export default function ExpenseControlCenter({
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Today
+                {t('common.today', 'Today')}
               </button>
               <button
                 type="button"
@@ -692,7 +692,7 @@ export default function ExpenseControlCenter({
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Yesterday
+                {t('common.yesterday', 'Yesterday')}
               </button>
               <button
                 type="button"
@@ -703,7 +703,7 @@ export default function ExpenseControlCenter({
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                All Dates
+                {t('common.allDates', 'All Dates')}
               </button>
             </div>
 
@@ -726,7 +726,7 @@ export default function ExpenseControlCenter({
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="text-xs font-bold bg-gray-50 border border-gray-200 rounded-2xl px-3 py-1.5 focus:bg-white focus:outline-none focus:border-[#0E7452] cursor-pointer"
             >
-              <option value="all">All Categories</option>
+              <option value="all">{t('common.allCategories', 'All Categories')}</option>
               {expenseCategories.map(c => (
                 <option key={c.id} value={c.id}>{c.icon} {c.label}</option>
               ))}
@@ -738,10 +738,10 @@ export default function ExpenseControlCenter({
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="text-xs font-bold bg-gray-50 border border-gray-200 rounded-2xl px-3 py-1.5 focus:bg-white focus:outline-none focus:border-[#0E7452] cursor-pointer"
             >
-              <option value="all">All Payment Methods</option>
-              <option value="cash">Cash Only</option>
-              <option value="bank">Bank / CBE Only</option>
-              <option value="telebirr">Telebirr Only</option>
+              <option value="all">{t('common.allPaymentMethods', 'All Payment Methods')}</option>
+              <option value="cash">{t('admin.expenseControl.cashOnly', 'Cash Only')}</option>
+              <option value="bank">{t('admin.expenseControl.bankOnly', 'Bank / CBE Only')}</option>
+              <option value="telebirr">{t('admin.expenseControl.telebirrOnly', 'Telebirr Only')}</option>
             </select>
 
             {/* Search Box */}
@@ -749,7 +749,7 @@ export default function ExpenseControlCenter({
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search description, staff, notes..."
+                placeholder={t('admin.expenseControl.searchPlaceholder', 'Search description, staff, notes...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-2xl w-56 font-medium focus:bg-white focus:outline-none focus:border-[#0E7452]"
@@ -761,9 +761,9 @@ export default function ExpenseControlCenter({
           {filteredVariableExpenses.length === 0 ? (
             <div className="text-center py-16 text-gray-400 space-y-2">
               <TrendingDown className="w-10 h-10 mx-auto text-gray-300" />
-              <h3 className="text-sm font-extrabold text-gray-700">No expense records found</h3>
+              <h3 className="text-sm font-extrabold text-gray-700">{t('admin.expenseControl.noRecords', 'No expense records found')}</h3>
               <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                No operating expenses matching your selected criteria were recorded.
+                {t('admin.expenseControl.noRecordsDesc', 'No operating expenses matching your selected criteria were recorded.')}
               </p>
             </div>
           ) : (
@@ -771,13 +771,13 @@ export default function ExpenseControlCenter({
               <table className="w-full min-w-[680px] text-left text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
-                    <th className="py-3 px-3">Date</th>
-                    <th className="py-3 px-3">Category</th>
-                    <th className="py-3 px-3">Description & Remarks</th>
-                    <th className="py-3 px-3">Recorded By</th>
-                    <th className="py-3 px-3 text-center">Payment</th>
-                    <th className="py-3 px-3 text-right">Amount (ETB)</th>
-                    <th className="py-3 px-3 text-right">Action</th>
+                    <th className="py-3 px-3">{t('common.date', 'Date')}</th>
+                    <th className="py-3 px-3">{t('common.category', 'Category')}</th>
+                    <th className="py-3 px-3">{t('admin.expenseControl.colDesc', 'Description & Remarks')}</th>
+                    <th className="py-3 px-3">{t('admin.expenseControl.colRecordedBy', 'Recorded By')}</th>
+                    <th className="py-3 px-3 text-center">{t('common.payment', 'Payment')}</th>
+                    <th className="py-3 px-3 text-right">{t('common.amountEtb', 'Amount (ETB)')}</th>
+                    <th className="py-3 px-3 text-right">{t('common.actions', 'Action')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -964,12 +964,12 @@ export default function ExpenseControlCenter({
             <table className="w-full min-w-[650px] text-left text-xs">
               <thead>
                 <tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
-                  <th className="py-3 px-3">Fixed Expense / Salary Item</th>
-                  <th className="py-3 px-3">Frequency</th>
-                  <th className="py-3 px-3">Due Day</th>
-                  <th className="py-3 px-3 text-right">Monthly Amount</th>
-                  <th className="py-3 px-3 text-center">Status ({selectedMonth})</th>
-                  <th className="py-3 px-3 text-right">Action</th>
+                  <th className="py-3 px-3">{t('admin.fixedExpenseManager.colExpense', 'Fixed Expense / Salary Item')}</th>
+                  <th className="py-3 px-3">{t('admin.expenseControl.frequency', 'Frequency')}</th>
+                  <th className="py-3 px-3">{t('admin.expenseControl.dueDay', 'Due Day')}</th>
+                  <th className="py-3 px-3 text-right">{t('admin.expenseControl.monthlyAmount', 'Monthly Amount')}</th>
+                  <th className="py-3 px-3 text-center">{t('common.status', 'Status')} ({selectedMonth})</th>
+                  <th className="py-3 px-3 text-right">{t('common.actions', 'Action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -985,7 +985,7 @@ export default function ExpenseControlCenter({
                         {item.fixed_expense?.payment_frequency || 'Monthly'}
                       </td>
                       <td className="py-3 px-3 text-gray-500 font-semibold">
-                        Day {item.fixed_expense?.due_day_of_month || 1}
+                        {t('common.day', 'Day')} {item.fixed_expense?.due_day_of_month || 1}
                       </td>
                       <td className="py-3 px-3 text-right font-black text-gray-900 text-sm">
                         {formatETB(item.fixed_expense?.monthly_amount)}
@@ -1001,7 +1001,7 @@ export default function ExpenseControlCenter({
                           }`}
                         >
                           {isPaid ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-                          <span>{isPaid ? 'PAID' : 'PENDING'}</span>
+                          <span>{isPaid ? t('common.paid', 'PAID') : t('common.pending', 'PENDING')}</span>
                         </button>
                       </td>
                       <td className="py-3 px-3 text-right">
@@ -1134,8 +1134,8 @@ export default function ExpenseControlCenter({
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-gray-900 text-base">Record Operating Expense</h3>
-                  <p className="text-xs text-gray-500 font-medium">Add a new cash or bank operational payment</p>
+                  <h3 className="font-extrabold text-gray-900 text-base">{t('admin.expenseControl.addModalTitle', 'Record Operating Expense')}</h3>
+                  <p className="text-xs text-gray-500 font-medium">{t('admin.expenseControl.addModalDesc', 'Add a new cash or bank operational payment')}</p>
                 </div>
               </div>
               <button
@@ -1237,7 +1237,7 @@ export default function ExpenseControlCenter({
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 rounded-2xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -1249,7 +1249,7 @@ export default function ExpenseControlCenter({
                   ) : (
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   )}
-                  <span>Save Expense</span>
+                  <span>{t('admin.expenseControl.createExpenseBtn', 'Save Expense')}</span>
                 </button>
               </div>
             </form>
@@ -1269,8 +1269,8 @@ export default function ExpenseControlCenter({
                   <Pencil className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-gray-900 text-base">Edit Operating Expense</h3>
-                  <p className="text-xs text-gray-500 font-medium">Modify amount, category, or notes with mandatory audit log</p>
+                  <h3 className="font-extrabold text-gray-900 text-base">{t('admin.expenseControl.editExpenseTitle', 'Edit Operating Expense')}</h3>
+                  <p className="text-xs text-gray-500 font-medium">{t('admin.expenseControl.editExpenseDesc', 'Modify amount, category, or notes with mandatory audit log')}</p>
                 </div>
               </div>
               <button
@@ -1384,7 +1384,7 @@ export default function ExpenseControlCenter({
                   onClick={() => setEditingExpense(null)}
                   className="px-4 py-2 rounded-2xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -1396,7 +1396,7 @@ export default function ExpenseControlCenter({
                   ) : (
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   )}
-                  <span>Save Changes</span>
+                  <span>{t('admin.expenseControl.saveExpenseBtn', 'Save Changes')}</span>
                 </button>
               </div>
             </form>
@@ -1415,7 +1415,7 @@ export default function ExpenseControlCenter({
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-extrabold text-gray-900 text-base">Delete / Void Expense</h3>
+                <h3 className="font-extrabold text-gray-900 text-base">{t('admin.expenseControl.deleteExpenseTitle', 'Delete / Void Expense')}</h3>
                 <p className="text-xs text-gray-500 font-medium">
                   {deletingExpense.expense_date} • {deletingExpense.expense_category}
                 </p>
@@ -1431,14 +1431,14 @@ export default function ExpenseControlCenter({
 
             <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 space-y-1.5">
               <p className="text-xs text-rose-900 font-semibold leading-relaxed">
-                Voiding this expense will permanently remove it from financial reports and adjust cash drawer reconciliation.
+                {t('admin.expenseControl.deleteNotice', 'Voiding this expense will permanently remove it from financial reports and adjust cash drawer reconciliation.')}
               </p>
               <div className="border-t border-rose-200 pt-2 flex items-center justify-between text-xs font-bold text-rose-900">
-                <span>Expense Description:</span>
+                <span>{t('admin.expenseControl.colDesc', 'Expense Description')}:</span>
                 <span className="font-black truncate max-w-[180px]">{deletingExpense.description}</span>
               </div>
               <div className="flex items-center justify-between text-xs font-bold text-rose-900">
-                <span>Amount:</span>
+                <span>{t('common.amountEtb', 'Amount')}:</span>
                 <span className="font-black text-sm">{formatETB(deletingExpense.amount)}</span>
               </div>
             </div>
@@ -1446,11 +1446,11 @@ export default function ExpenseControlCenter({
             <form onSubmit={handleDeleteSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-black text-gray-800 mb-1">
-                  Reason for Deletion *
+                  {t('admin.expenseControl.reasonDeletion', 'Reason for Deletion *')}
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Duplicate entry, cashier mistake, cancelled purchase"
+                  placeholder={t('admin.expenseControl.reasonDeletionPlaceholder', 'e.g. Duplicate entry, cashier mistake, cancelled purchase')}
                   value={deleteReason}
                   onChange={(e) => setDeleteReason(e.target.value)}
                   className="w-full text-xs font-bold bg-gray-50 border border-gray-300 rounded-2xl px-3 py-2 text-gray-900 focus:bg-white focus:outline-none focus:border-rose-600"
@@ -1464,7 +1464,7 @@ export default function ExpenseControlCenter({
                   onClick={() => setDeletingExpense(null)}
                   className="px-4 py-2 rounded-2xl border border-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-100 cursor-pointer"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -1476,7 +1476,7 @@ export default function ExpenseControlCenter({
                   ) : (
                     <Trash2 className="w-3.5 h-3.5" />
                   )}
-                  <span>Confirm Delete</span>
+                  <span>{t('admin.expenseControl.deleteConfirmBtn', 'Confirm Delete')}</span>
                 </button>
               </div>
             </form>

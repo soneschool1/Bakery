@@ -41,6 +41,20 @@ export function LanguageProvider({ children }) {
     }
   }, []);
 
+  // Synchronize document language and typography classes
+  useEffect(() => {
+    try {
+      document.documentElement.lang = language;
+      if (language === 'am') {
+        document.body.classList.add('font-amharic');
+      } else {
+        document.body.classList.remove('font-amharic');
+      }
+    } catch {
+      // ignore SSR or test environments
+    }
+  }, [language]);
+
   // Translation lookup helper supporting nested dot notation (e.g. 'baker.doughWeightStep')
   const t = useCallback((path, fallback = '') => {
     if (!path) return '';

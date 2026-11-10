@@ -580,10 +580,10 @@ export default function StockControlCenter({
               <Info className="w-5 h-5 text-[#064e3b] shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-black text-stone-900">
-                  Real-Time Stock Movement Integration
+                  {t('admin.stockControlCenter.explanationBannerTitle', 'Real-Time Stock Movement Integration')}
                 </h3>
                 <p className="text-xs text-stone-600 mt-1">
-                  Whenever the <strong>Baker bakes a batch</strong>, the ingredients (flour, yeast, salt, maj mix) are automatically deducted from stock. Whenever the <strong>Cashier restocks / recharges</strong>, new raw materials are added directly to the store stock.
+                  {t('admin.stockControlCenter.explanationBannerText', 'Whenever the Baker bakes a batch, raw materials are automatically deducted and finished bread is added to the store stock. Whenever the Cashier sells or dispatches bread, shelf stock decreases instantly.')}
                 </p>
               </div>
             </div>

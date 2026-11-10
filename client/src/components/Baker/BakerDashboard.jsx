@@ -924,7 +924,7 @@ export default function BakerDashboard({
                     <div className={`p-4 rounded-2xl border transition-all ${isLow ? 'bg-rose-50/70 border-rose-300' : 'bg-emerald-50/50 border-emerald-200'}`}>
                       <label className="block text-xs font-black text-emerald-950 uppercase mb-1 flex items-center justify-between">
                         <span>{t('baker.flourKg', '🌾 Flour (kilo) *')}</span>
-                        {isLow && <span className="text-[9px] bg-rose-200 text-rose-800 px-1 rounded-sm animate-pulse">Low</span>}
+                        {isLow && <span className="text-[9px] bg-rose-200 text-rose-800 px-1 rounded-sm animate-pulse">{t('common.low', 'Low')}</span>}
                       </label>
                       <input
                         type="number"
@@ -961,7 +961,7 @@ export default function BakerDashboard({
                         placeholder="e.g. 500"
                       />
                       <div className="mt-1 flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-stone-500">In store:</span>
+                        <span className="text-stone-500">{t('baker.inStore', 'In store:')}</span>
                         <span className="text-stone-900 font-extrabold">{majStock} {majMat?.unit || 'g'}</span>
                       </div>
                     </div>
@@ -985,7 +985,7 @@ export default function BakerDashboard({
                         placeholder="e.g. 250"
                       />
                       <div className="mt-1 flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-stone-500">In store:</span>
+                        <span className="text-stone-500">{t('baker.inStore', 'In store:')}</span>
                         <span className="text-stone-900 font-extrabold">{yeastStock} {yeastMat?.unit || 'g'}</span>
                       </div>
                     </div>
@@ -1009,7 +1009,7 @@ export default function BakerDashboard({
                         placeholder="e.g. 500"
                       />
                       <div className="mt-1 flex items-center justify-between text-[11px] font-bold">
-                        <span className="text-stone-500">In store:</span>
+                        <span className="text-stone-500">{t('baker.inStore', 'In store:')}</span>
                         <span className="text-stone-900 font-extrabold">{saltStock} {saltMat?.unit || 'g'}</span>
                       </div>
                     </div>
@@ -1083,7 +1083,7 @@ export default function BakerDashboard({
                       ~{estimatedDoughTotalKg} kg
                     </span>
                     <span className="text-[11px] text-stone-400 font-medium">
-                      Total raw dough in mixing bowl
+                      {t('baker.totalRawDoughInBowl', 'Total raw dough in mixing bowl')}
                     </span>
                   </div>
 
@@ -1271,7 +1271,7 @@ export default function BakerDashboard({
                                 </span>
                               </div>
                               <div className="flex items-center space-x-2 text-xs font-semibold text-stone-500 mt-0.5">
-                                <span>Standard: <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
+                                <span>{t('baker.standardLabel', 'Standard:')} <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
                               </div>
                             </div>
                           </div>
@@ -1409,7 +1409,7 @@ export default function BakerDashboard({
                                   onChange={(e) => handleUpdateBreadPieces(bread.productId, e.target.value)}
                                   className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-[#0E7452] text-center focus:outline-none"
                                 />
-                                <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">pcs</span>
+                                <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">{t('common.pieces', 'pcs')}</span>
                               </div>
                               <button
                                 type="button"

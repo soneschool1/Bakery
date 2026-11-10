@@ -14,8 +14,10 @@ import {
   DollarSign,
   Receipt,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Globe
 } from 'lucide-react';
+import LanguageSelector from '../LanguageSelector';
 import AdminDashboard from './AdminDashboard';
 import ReportsCenter from './ReportsCenter';
 import ProductionManager from './ProductionManager';
@@ -428,6 +430,17 @@ export default function AdminPanel({
               >
                 {t('admin.auditLogsSubTab', '🛡️ Audit Logs')}
               </button>
+              <button
+                type="button"
+                onClick={() => setSettingsSubTab('language')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  settingsSubTab === 'language' 
+                    ? 'bg-[#0E7452] text-white shadow-xs' 
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {t('admin.languageSubTab', '🌐 Language & Localization')}
+              </button>
             </div>
 
             {settingsSubTab === 'fixed' && (
@@ -464,6 +477,45 @@ export default function AdminPanel({
 
             {settingsSubTab === 'audit' && (
               <AuditLogViewer auditLogs={auditLogs} />
+            )}
+
+            {settingsSubTab === 'language' && (
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm space-y-6">
+                <div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 text-[#0E7452] flex items-center justify-center">
+                      <Globe className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                        {t('admin.languageSettingsTitle', 'System Language & Localization')}
+                      </h2>
+                      <p className="text-xs text-slate-500 font-medium">
+                        {t('admin.languageSettingsDesc', 'Choose the system language. Changes apply instantly across Baker, Cashier, and Admin portals.')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <LanguageSelector variant="card" />
+
+                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-2 text-xs">
+                  <div className="font-bold text-slate-800 dark:text-slate-200">
+                    {t('admin.dialectNoticeTitle', 'Regional Dialects & Font Optimization:')}
+                  </div>
+                  <ul className="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-400">
+                    <li>
+                      <strong>Afaan Oromoo (Loqoda Shawa):</strong> {t('admin.omDialectNote', 'Tailored to local Shewa phrasing for bakery production, dispatch, and cash management.')}
+                    </li>
+                    <li>
+                      <strong>አማርኛ (Amharic):</strong> {t('admin.amFontNote', 'Loaded with Google Noto Sans Ethiopic typography and adaptive vertical line-height for clean glyph display.')}
+                    </li>
+                    <li>
+                      <strong>English (Standard):</strong> {t('admin.enStandardNote', 'International business terminology.')}
+                    </li>
+                  </ul>
+                </div>
+              </div>
             )}
           </div>
         )}

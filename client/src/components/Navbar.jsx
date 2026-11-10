@@ -79,14 +79,14 @@ export default function Navbar({
         <div className="bg-amber-600 text-white px-3 sm:px-8 py-1.5 sm:py-2 text-xs font-black flex items-center justify-between gap-2 shadow-xs sticky top-0 z-50">
           <div className="flex items-center space-x-2 truncate">
             <ShieldCheck className="w-4 h-4 text-amber-200 shrink-0" />
-            <span className="truncate">Admin Mode: <strong>{currentUser?.role === 'baker' ? '🥖 Baker Desk' : '🏪 Cashier POS'}</strong></span>
+            <span className="truncate">{t('nav.adminMode', 'Admin Mode:')} <strong>{currentUser?.role === 'baker' ? t('nav.bakerDeskShort', '🥖 Baker Desk') : t('nav.cashierPosShort', '🏪 Cashier POS')}</strong></span>
           </div>
           <button
             type="button"
             onClick={returnToAdmin}
             className="bg-white text-amber-900 px-2.5 py-1 rounded-xl text-xs font-black hover:bg-amber-50 cursor-pointer shadow-xs transition-transform active:scale-95 shrink-0"
           >
-            ← Admin
+            ← {t('nav.admin', 'Admin')}
           </button>
         </div>
       )}
@@ -186,13 +186,13 @@ export default function Navbar({
           </div>
         )}
 
-        {/* Right Status, Flour Milestone, Language Selector, Notifications & Profile Menu */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
-          {/* Language Selector Dropdown */}
-          <LanguageSelector />
+        {/* Right Status, Language Selector, Notifications & Profile Menu */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          {/* Segmented Language Selector in Header */}
+          <LanguageSelector variant="segmented" />
 
           {/* Live System Indicator */}
-          <div className="hidden sm:flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1.5 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <div className="hidden lg:flex items-center space-x-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-2.5 py-1.5 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-300">
             <span className={`w-2 h-2 rounded-full ${sseConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
             <span className="text-[11px] font-bold">{sseConnected ? t('common.live', 'Online') : t('common.connecting', 'Connecting')}</span>
           </div>
@@ -202,7 +202,7 @@ export default function Navbar({
             type="button"
             onClick={onOpenNotifications}
             className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
-            title="Notifications"
+            title={t('nav.notifications', 'Notifications')}
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
@@ -232,13 +232,13 @@ export default function Navbar({
 
             {/* Profile Dropdown Menu */}
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-2 z-50">
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.08)] p-2.5 z-50 animate-in fade-in slide-in-from-top-2">
                 <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                  <p className="text-xs font-black text-slate-900 dark:text-white truncate">
                     {currentUser?.full_name}
                   </p>
                   <p className="text-[10px] font-bold text-[#0E7452] uppercase tracking-wider mt-0.5">
-                    Role: {currentUser?.role}
+                    {t('common.role', 'Role')}: {currentUser?.role}
                   </p>
                   {isAdmin && (
                     <p className="text-[10px] text-slate-400 mt-1 flex items-center space-x-1">
@@ -252,7 +252,7 @@ export default function Navbar({
                 {isAdmin && (
                   <div className="py-2 border-b border-slate-100 dark:border-slate-800 space-y-1">
                     <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider block">
-                      Switch Workplace Desk:
+                      {t('nav.switchDesk', 'Switch Workplace Desk:')}
                     </span>
                     <button
                       type="button"
@@ -262,7 +262,7 @@ export default function Navbar({
                       }`}
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Admin Management</span>
+                      <span>{t('nav.adminManagement', 'Admin Management')}</span>
                     </button>
                     <button
                       type="button"
@@ -272,7 +272,7 @@ export default function Navbar({
                       }`}
                     >
                       <Wheat className="w-3.5 h-3.5" />
-                      <span>🥖 Head Baker Desk</span>
+                      <span>{t('nav.bakerDeskShort', '🥖 Head Baker Desk')}</span>
                     </button>
                     <button
                       type="button"
@@ -282,7 +282,7 @@ export default function Navbar({
                       }`}
                     >
                       <Store className="w-3.5 h-3.5" />
-                      <span>🏪 Cashier POS Desk</span>
+                      <span>{t('nav.cashierPosShort', '🏪 Cashier POS Desk')}</span>
                     </button>
                   </div>
                 )}
@@ -301,6 +301,16 @@ export default function Navbar({
                     <span>{t('nav.returnToAdmin', 'Return to Admin Portal')}</span>
                   </button>
                 )}
+
+                {/* Language Switcher inside Profile Menu */}
+                <div className="py-2 border-b border-slate-100 dark:border-slate-800 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-400 px-2 uppercase tracking-wider block">
+                    {t('common.selectLanguage', 'Language / Afaan / ቋንቋ:')}
+                  </span>
+                  <div className="px-1">
+                    <LanguageSelector variant="segmented" className="w-full justify-center" />
+                  </div>
+                </div>
 
                 {/* Sign Out Button */}
                 <button
