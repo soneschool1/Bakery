@@ -76,7 +76,6 @@ export default function BakerDashboard({
   const step2Ref = useRef(null);
   const step3Ref = useRef(null);
   const step4Ref = useRef(null);
-  const step5Ref = useRef(null);
 
   // Active products in selected category
   const categoryProducts = useMemo(() => {
@@ -306,11 +305,11 @@ export default function BakerDashboard({
       pieces: preset.pieces || 500,
     }]);
 
-    setSuccessMsg(`✨ Preset loaded: ${preset.label}! Moving to Step 4 (Dough Weight & Pieces)...`);
+    setSuccessMsg(`✨ Preset loaded: ${preset.label}! Moving to Step 3 (Varieties & Weights)...`);
     setTimeout(() => {
       setSuccessMsg('');
-      setActiveStep(4);
-      setHighlightedStep(4);
+      setActiveStep(3);
+      setHighlightedStep(3);
     }, 600);
   }
 
@@ -318,7 +317,7 @@ export default function BakerDashboard({
   function handleCategorySelect(catId) {
     setCookingCategory(catId);
     setAnimatingCategory(catId);
-    setAutoAdvanceNotice(`✨ ${catId} chosen! Moving to Step 2 (Select Varieties)...`);
+    setAutoAdvanceNotice(`✨ ${catId} chosen! Moving to Step 2 (Mixer Ingredients)...`);
 
     // Smart default presets per category
     if (catId === 'Bread') {
@@ -451,7 +450,7 @@ export default function BakerDashboard({
     setActiveStep(stepNum);
     setHighlightedStep(stepNum);
     if (viewMode === 'scroll') {
-      const stepRefs = { 1: step1Ref, 2: step2Ref, 3: step3Ref, 4: step4Ref, 5: step5Ref };
+      const stepRefs = { 1: step1Ref, 2: step2Ref, 3: step3Ref, 4: step4Ref };
       stepRefs[stepNum]?.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     setTimeout(() => setHighlightedStep(null), 1400);
@@ -593,10 +592,9 @@ export default function BakerDashboard({
 
   const stepTitles = [
     { num: 1, title: 'Category', subtitle: cookingCategory, icon: Wheat },
-    { num: 2, title: 'Varieties', subtitle: `${selectedBreads.length} selected`, icon: Cookie },
-    { num: 3, title: 'Ingredients', subtitle: `${flourKg}kg flour (~${estimatedDoughTotalKg}kg dough)`, icon: Scale },
-    { num: 4, title: 'Dough Weight', subtitle: `${selectedBreads.length > 1 ? selectedBreads.length + ' varieties' : (selectedBreads[0]?.weight_grams || 100) + 'g portion'}`, icon: Layers },
-    { num: 5, title: 'Bake & Send', subtitle: `${totalPieces} pcs total`, icon: CheckCircle2 },
+    { num: 2, title: 'Ingredients', subtitle: `${flourKg}kg flour (~${estimatedDoughTotalKg}kg dough)`, icon: Scale },
+    { num: 3, title: 'Varieties & Weights', subtitle: `${selectedBreads.length} varieties (${totalPieces} pcs)`, icon: Layers },
+    { num: 4, title: 'Bake & Send', subtitle: `${totalPieces} pcs (${totalDoughRequiredKg} kg)`, icon: CheckCircle2 },
   ];
 
   return (
@@ -716,7 +714,7 @@ export default function BakerDashboard({
                   {activeStep}
                 </span>
                 <span className="text-sm font-extrabold text-stone-900">
-                  Step {activeStep} of 5: {stepTitles[activeStep - 1]?.title}
+                  Step {activeStep} of 4: {stepTitles[activeStep - 1]?.title}
                 </span>
                 <span className="text-xs font-bold text-stone-500">
                   ({stepTitles[activeStep - 1]?.subtitle})
@@ -746,8 +744,8 @@ export default function BakerDashboard({
               </div>
             </div>
 
-            {/* Clickable 5-Step Progress Pills (Horizontal swipeable on mobile) */}
-            <div className="overflow-x-auto flex sm:grid sm:grid-cols-5 gap-2 scrollbar-none pb-1 sm:pb-0">
+            {/* Clickable 4-Step Progress Pills (Horizontal swipeable on mobile) */}
+            <div className="overflow-x-auto flex sm:grid sm:grid-cols-4 gap-2 scrollbar-none pb-1 sm:pb-0">
               {stepTitles.map((step) => {
                 const isActive = activeStep === step.num;
                 const isCompleted = activeStep > step.num;
@@ -790,7 +788,7 @@ export default function BakerDashboard({
             <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
               <div 
                 className="bg-gradient-to-r from-[#064e3b] via-[#0E7452] to-emerald-400 h-full transition-all duration-300 rounded-full"
-                style={{ width: `${(activeStep / 5) * 100}%` }}
+                style={{ width: `${(activeStep / 4) * 100}%` }}
               />
             </div>
           </div>
@@ -882,180 +880,26 @@ export default function BakerDashboard({
                   onClick={() => jumpToStep(2)}
                   className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Choose Product Variety</span>
+                  <span>Next: Enter Mixer Ingredients</span>
                   <ArrowRight className="w-4 h-4 text-emerald-300" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 2: CHOOSE PRODUCT VARIETIES (MULTI-SELECT) */}
+          {/* STEP 2: ENTER INGREDIENTS CONSUMPTION */}
           {(viewMode === 'scroll' || activeStep === 2) && (
             <div 
               ref={step2Ref}
-              className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-5 transition-all duration-300 ${
-                highlightedStep === 2 ? 'ring-4 ring-emerald-500/40' : ''
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-stone-100">
-                <div>
-                  <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
-                    <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
-                      2
-                    </span>
-                    <span>Select Varieties of {cookingCategory} to Bake Together:</span>
-                  </h2>
-                  <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Check off one or multiple varieties to bake together in this batch. Content & dough weights combine automatically.
-                  </p>
-                </div>
-                
-                <div className="flex items-center space-x-2 self-start sm:self-auto">
-                  <button
-                    type="button"
-                    onClick={handleSelectAllBreads}
-                    className="text-xs font-black text-[#0E7452] hover:text-[#064e3b] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-                  >
-                    Select All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => jumpToStep(1)}
-                    className="text-xs font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center space-x-1"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Change Category</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Product variety cards grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoryProducts.length === 0 ? (
-                  <div className="col-span-full text-center py-10 text-stone-400 font-bold text-xs bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                    No active products found in category "{cookingCategory}". Please select another category.
-                  </div>
-                ) : (
-                  categoryProducts.map((p) => {
-                    const isSelected = selectedBreads.some(b => b.productId === p.id);
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => handleToggleBread(p)}
-                        className={`group p-4 sm:p-5 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between min-h-[9rem] relative cursor-pointer select-none ${
-                          isSelected
-                            ? 'border-[#0E7452] bg-emerald-50/90 shadow-md ring-2 ring-emerald-500/30'
-                            : 'border-stone-200 bg-stone-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-xs'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <span className="font-black text-base text-stone-900 group-hover:text-[#0E7452] block transition-colors truncate">
-                              {p.name}
-                            </span>
-                            <div className="flex items-center space-x-2 text-xs font-bold text-stone-500 mt-0.5">
-                              <span>{p.category}</span>
-                            </div>
-                          </div>
-
-                          {/* Checkbox badge */}
-                          <div className={`w-7 h-7 rounded-xl flex items-center justify-center transition-all shrink-0 ${
-                            isSelected
-                              ? 'bg-[#0E7452] text-white shadow-xs'
-                              : 'border-2 border-stone-300 bg-white group-hover:border-[#0E7452] text-transparent'
-                          }`}>
-                            <Check className="w-4 h-4 stroke-[3]" />
-                          </div>
-                        </div>
-
-                        <div className="pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs mt-3">
-                          <span className="font-bold text-stone-500">Standard Portion:</span>
-                          <span className={`font-black px-2.5 py-0.5 rounded-lg border text-xs ${
-                            isSelected
-                              ? 'bg-white border-emerald-300 text-[#0E7452]'
-                              : 'bg-white border-stone-200 text-stone-700'
-                          }`}>
-                            {p.weight_grams || 100}g
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Bottom Selected Varieties Summary Bar */}
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 space-y-2">
-                <div className="flex items-center justify-between text-xs font-black text-emerald-950">
-                  <span className="flex items-center space-x-1.5">
-                    <Package className="w-4 h-4 text-[#0E7452]" />
-                    <span>Varieties Included in Batch ({selectedBreads.length}):</span>
-                  </span>
-                  <span className="text-[11px] font-bold text-emerald-800">
-                    Click any card above to add or remove
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {selectedBreads.map((b) => (
-                    <div 
-                      key={b.productId}
-                      className="bg-white border border-emerald-300 text-stone-900 rounded-xl px-3 py-1.5 text-xs font-black shadow-2xs flex items-center space-x-2"
-                    >
-                      <span>🥖 {b.name} ({b.weight_grams || 100}g)</span>
-                      {selectedBreads.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveBread(b.productId);
-                          }}
-                          className="w-4 h-4 rounded-full bg-stone-100 hover:bg-rose-100 text-stone-400 hover:text-rose-700 flex items-center justify-center cursor-pointer transition-colors"
-                          title="Remove from batch"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Step 2 Footer Navigation */}
-              <div className="pt-2 flex items-center justify-between border-t border-stone-100">
-                <button
-                  type="button"
-                  onClick={() => jumpToStep(1)}
-                  className="text-stone-600 hover:text-stone-900 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-stone-100 transition-all flex items-center space-x-1.5 cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Categories</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => jumpToStep(3)}
-                  className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
-                >
-                  <span>Next: Check Ingredients ({selectedBreads.length} Varieties)</span>
-                  <ArrowRight className="w-4 h-4 text-emerald-200" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: ENTER INGREDIENTS CONSUMPTION */}
-          {(viewMode === 'scroll' || activeStep === 3) && (
-            <div 
-              ref={step3Ref}
               className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4 transition-all duration-300 ${
-                highlightedStep === 3 ? 'ring-4 ring-emerald-500/40' : ''
+                highlightedStep === 2 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
                     <span className="w-8 h-8 rounded-full bg-[#064e3b] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
-                      3
+                      2
                     </span>
                     <span>Enter Ingredients Used for This Batch:</span>
                   </h2>
@@ -1065,7 +909,7 @@ export default function BakerDashboard({
                 </div>
                 <div className="flex items-center space-x-2 text-xs font-bold bg-emerald-50 text-emerald-900 px-3 py-1.5 rounded-xl border border-emerald-200 self-start sm:self-auto">
                   <Package className="w-4 h-4 text-[#064e3b]" />
-                  <span>Varieties: <strong>{selectedBreads.length} selected</strong></span>
+                  <span>Category: <strong>{cookingCategory}</strong></span>
                 </div>
               </div>
 
@@ -1268,253 +1112,320 @@ export default function BakerDashboard({
                     <span className="text-[10px] text-stone-400 mt-1 font-medium">
                       {Number(doughDifferenceKg) >= 0 
                         ? 'Mixer dough is sufficient for all planned bread varieties.' 
-                        : 'Increase flour or adjust pieces in Step 4.'}
+                        : 'Increase flour or adjust pieces in Step 3.'}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Step 3 Footer Navigation */}
+              {/* Step 2 Footer Navigation */}
               <div className="pt-2 flex items-center justify-between border-t border-stone-100">
                 <button
                   type="button"
-                  onClick={() => jumpToStep(2)}
+                  onClick={() => jumpToStep(1)}
                   className="text-stone-600 hover:text-stone-900 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-stone-100 transition-all flex items-center space-x-1.5 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Back to Product Variety</span>
+                  <span>Back to Categories</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => jumpToStep(4)}
+                  onClick={() => jumpToStep(3)}
                   className="bg-[#064e3b] hover:bg-[#043729] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <span>Next: Set Dough Weight & Quantities ({selectedBreads.length} Varieties)</span>
+                  <span>Next: Select Varieties & Set Dough Weights</span>
                   <ArrowRight className="w-4 h-4 text-emerald-300" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: ENTER DOUGH WEIGHT & QUANTITIES PER BREAD VARIETY */}
-          {(viewMode === 'scroll' || activeStep === 4) && (
+          {/* STEP 3: SELECT VARIETIES & SET DOUGH WEIGHT / QUANTITIES (SINGLE STEP) */}
+          {(viewMode === 'scroll' || activeStep === 3) && (
             <div 
-              ref={step4Ref}
+              ref={step3Ref}
               className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6 transition-all duration-300 ${
-                highlightedStep === 4 ? 'ring-4 ring-emerald-500/40' : ''
+                highlightedStep === 3 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
                     <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
-                      4
+                      3
                     </span>
-                    <span>Dough Weight & Quantities for Each Variety:</span>
+                    <span>Select Varieties & Set Dough Weight / Quantities:</span>
                   </h2>
                   <p className="text-xs text-stone-500 font-semibold ml-10">
-                    Adjust the raw portion weight (grams) and production pieces separately for each bread in this batch
+                    Select bread varieties to bake together and adjust portion weights and quantities for each variety
                   </p>
                 </div>
+                
                 <div className="flex items-center space-x-2 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllBreads}
+                    className="text-xs font-black text-[#0E7452] hover:text-[#064e3b] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                  >
+                    Select All
+                  </button>
                   <span className="text-xs font-black text-[#0E7452] bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5">
                     <Package className="w-4 h-4" />
                     <span>{selectedBreads.length} {selectedBreads.length === 1 ? 'Variety' : 'Varieties'}</span>
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => jumpToStep(2)}
-                    className="text-xs font-bold text-stone-600 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center space-x-1"
-                    title="Add or remove bread varieties"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add/Remove Bread</span>
-                  </button>
                 </div>
               </div>
 
-              {/* Individual Variety Cards List */}
-              <div className="space-y-4">
-                {selectedBreads.map((bread, index) => {
-                  const breadPieces = Number(bread.pieces) || 0;
-                  const breadWeight = Number(bread.weight_grams) || 100;
-                  const breadTotalKg = ((breadPieces * breadWeight) / 1000).toFixed(1);
+              {/* 1. Variety Selection Cards Grid */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-stone-800 uppercase tracking-wider flex items-center space-x-1.5">
+                    <Wheat className="w-4 h-4 text-[#0E7452]" />
+                    <span>1. Choose Varieties of {cookingCategory}:</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-stone-500">
+                    Tap to add or remove varieties from batch
+                  </span>
+                </div>
 
-                  return (
-                    <div 
-                      key={bread.productId} 
-                      className="bg-stone-50/70 border-2 border-stone-200 hover:border-emerald-300 rounded-2xl p-4 sm:p-5 space-y-4 transition-all"
-                    >
-                      {/* Variety Card Top Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-200">
-                        <div className="flex items-center space-x-3">
-                          <span className="w-7 h-7 rounded-lg bg-[#0E7452] text-white inline-flex items-center justify-center text-xs font-black shrink-0">
-                            #{index + 1}
-                          </span>
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <h3 className="text-base font-black text-stone-900">
-                                {bread.name}
-                              </h3>
-                              <span className="text-[11px] font-bold bg-white text-stone-600 px-2 py-0.5 rounded-md border border-stone-200">
-                                {bread.category}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {categoryProducts.length === 0 ? (
+                    <div className="col-span-full text-center py-8 text-stone-400 font-bold text-xs bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                      No active products found in category "{cookingCategory}". Please select another category.
+                    </div>
+                  ) : (
+                    categoryProducts.map((p) => {
+                      const isSelected = selectedBreads.some(b => b.productId === p.id);
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => handleToggleBread(p)}
+                          className={`group p-4 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between min-h-[5.5rem] relative cursor-pointer select-none ${
+                            isSelected
+                              ? 'border-[#0E7452] bg-emerald-50/90 shadow-sm ring-2 ring-emerald-500/20'
+                              : 'border-stone-200 bg-stone-50/70 hover:bg-white hover:border-emerald-300 hover:shadow-xs'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="font-black text-sm sm:text-base text-stone-900 group-hover:text-[#0E7452] block transition-colors truncate">
+                                {p.name}
+                              </span>
+                              <div className="flex items-center space-x-2 text-xs font-bold text-stone-500 mt-0.5">
+                                <span>Standard: {p.weight_grams || 100}g</span>
+                              </div>
+                            </div>
+
+                            {/* Checkbox badge */}
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+                              isSelected
+                                ? 'bg-[#0E7452] text-white shadow-xs'
+                                : 'border-2 border-stone-300 bg-white group-hover:border-[#0E7452] text-transparent'
+                            }`}>
+                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* 2. Dough Weight & Quantities Controls for Each Selected Variety */}
+              <div className="space-y-4 pt-3 border-t border-stone-100">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-stone-800 uppercase tracking-wider flex items-center space-x-1.5">
+                    <Scale className="w-4 h-4 text-[#0E7452]" />
+                    <span>2. Dough Weight & Pieces for Each Variety ({selectedBreads.length}):</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-[#0E7452]">
+                    Total Output: {totalPieces} pcs (~{totalDoughRequiredKg} kg)
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {selectedBreads.map((bread, index) => {
+                    const breadPieces = Number(bread.pieces) || 0;
+                    const breadWeight = Number(bread.weight_grams) || 100;
+                    const breadTotalKg = ((breadPieces * breadWeight) / 1000).toFixed(1);
+
+                    return (
+                      <div 
+                        key={bread.productId} 
+                        className="bg-stone-50/70 border-2 border-stone-200 hover:border-emerald-300 rounded-2xl p-4 sm:p-5 space-y-4 transition-all"
+                      >
+                        {/* Variety Card Top Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-200">
+                          <div className="flex items-center space-x-3">
+                            <span className="w-7 h-7 rounded-lg bg-[#0E7452] text-white inline-flex items-center justify-center text-xs font-black shrink-0">
+                              #{index + 1}
+                            </span>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <h3 className="text-base font-black text-stone-900">
+                                  {bread.name}
+                                </h3>
+                                <span className="text-[11px] font-bold bg-white text-stone-600 px-2 py-0.5 rounded-md border border-stone-200">
+                                  {bread.category}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-xs font-semibold text-stone-500 mt-0.5">
+                                <span>Standard: <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-3 self-end sm:self-auto">
+                            {/* Variety subtotal preview badge */}
+                            <div className="text-right text-xs bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
+                              <span className="text-stone-400 font-bold block text-[10px] uppercase">Batch Dough</span>
+                              <span className="font-black text-[#0E7452]">
+                                {breadTotalKg} kg
                               </span>
                             </div>
-                            <div className="flex items-center space-x-2 text-xs font-semibold text-stone-500 mt-0.5">
-                              <span>Standard: <strong className="text-stone-700">{bread.standard_weight_grams || 100}g</strong></span>
-                            </div>
+
+                            {selectedBreads.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveBread(bread.productId)}
+                                className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-rose-100 text-stone-400 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                                title={`Remove ${bread.name} from batch`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-3 self-end sm:self-auto">
-                          {/* Variety subtotal preview badge */}
-                          <div className="text-right text-xs bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-2xs">
-                            <span className="text-stone-400 font-bold block text-[10px] uppercase">Batch Dough</span>
-                            <span className="font-black text-[#0E7452]">
-                              {breadTotalKg} kg
-                            </span>
+                        {/* Weight and Pieces Controls Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          
+                          {/* 1. Portion Weight Control */}
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
+                                <Scale className="w-3.5 h-3.5 text-[#0E7452]" />
+                                <span>Portion Weight (Grams):</span>
+                              </label>
+                              <span className="text-[11px] font-bold text-stone-500">
+                                Target per piece
+                              </span>
+                            </div>
+
+                            {/* Quick Weight Presets */}
+                            <div className="flex flex-wrap gap-1.5">
+                              {[40, 60, 80, 100, 120, 150, 200].map((g) => (
+                                <button
+                                  key={g}
+                                  type="button"
+                                  onClick={() => handleUpdateBreadWeight(bread.productId, g)}
+                                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                                    breadWeight === g
+                                      ? 'bg-[#0E7452] text-white shadow-xs'
+                                      : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
+                                  }`}
+                                >
+                                  {g}g
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Numeric input with +/- step */}
+                            <div className="flex items-center space-x-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateBreadWeight(bread.productId, Math.max(10, breadWeight - 10))}
+                                className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                              >
+                                -
+                              </button>
+                              <div className="relative flex-1">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  step="1"
+                                  value={bread.weight_grams}
+                                  onChange={(e) => handleUpdateBreadWeight(bread.productId, e.target.value)}
+                                  className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-stone-900 text-center focus:outline-none"
+                                />
+                                <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">g</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateBreadWeight(bread.productId, breadWeight + 10)}
+                                className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
 
-                          {selectedBreads.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveBread(bread.productId)}
-                              className="w-8 h-8 rounded-xl bg-stone-100 hover:bg-rose-100 text-stone-400 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
-                              title={`Remove ${bread.name} from batch`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
+                          {/* 2. Pieces Baked Control */}
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
+                                <Package className="w-3.5 h-3.5 text-[#0E7452]" />
+                                <span>Pieces Baked for {bread.name}:</span>
+                              </label>
+                              <span className="text-[11px] font-bold text-stone-500">
+                                Units produced
+                              </span>
+                            </div>
+
+                            {/* Quick Pieces Presets */}
+                            <div className="flex flex-wrap gap-1.5">
+                              {[50, 100, 150, 200, 250, 300, 500].map((pQty) => (
+                                <button
+                                  key={pQty}
+                                  type="button"
+                                  onClick={() => handleUpdateBreadPieces(bread.productId, pQty)}
+                                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                                    breadPieces === pQty
+                                      ? 'bg-[#0E7452] text-white shadow-xs'
+                                      : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
+                                  }`}
+                                >
+                                  {pQty} pcs
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Numeric input with +/- step */}
+                            <div className="flex items-center space-x-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateBreadPieces(bread.productId, Math.max(0, breadPieces - 25))}
+                                className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                              >
+                                -
+                              </button>
+                              <div className="relative flex-1">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  value={bread.pieces}
+                                  onChange={(e) => handleUpdateBreadPieces(bread.productId, e.target.value)}
+                                  className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-[#0E7452] text-center focus:outline-none"
+                                />
+                                <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">pcs</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateBreadPieces(bread.productId, breadPieces + 25)}
+                                className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
                         </div>
                       </div>
-
-                      {/* Weight and Pieces Controls Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        
-                        {/* 1. Portion Weight Control */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
-                              <Scale className="w-3.5 h-3.5 text-[#0E7452]" />
-                              <span>Portion Weight (Grams):</span>
-                            </label>
-                            <span className="text-[11px] font-bold text-stone-500">
-                              Target per piece
-                            </span>
-                          </div>
-
-                          {/* Quick Weight Presets */}
-                          <div className="flex flex-wrap gap-1.5">
-                            {[40, 60, 80, 100, 120, 150, 200].map((g) => (
-                              <button
-                                key={g}
-                                type="button"
-                                onClick={() => handleUpdateBreadWeight(bread.productId, g)}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                                  breadWeight === g
-                                    ? 'bg-[#0E7452] text-white shadow-xs'
-                                    : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
-                                }`}
-                              >
-                                {g}g
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Numeric input with +/- step */}
-                          <div className="flex items-center space-x-2 pt-1">
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateBreadWeight(bread.productId, Math.max(10, breadWeight - 10))}
-                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
-                            >
-                              -
-                            </button>
-                            <div className="relative flex-1">
-                              <input
-                                type="number"
-                                min="1"
-                                step="1"
-                                value={bread.weight_grams}
-                                onChange={(e) => handleUpdateBreadWeight(bread.productId, e.target.value)}
-                                className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-stone-900 text-center focus:outline-none"
-                              />
-                              <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">g</span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateBreadWeight(bread.productId, breadWeight + 10)}
-                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* 2. Pieces Baked Control */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs font-black text-stone-800 uppercase flex items-center space-x-1.5">
-                              <Package className="w-3.5 h-3.5 text-[#0E7452]" />
-                              <span>Pieces Baked for {bread.name}:</span>
-                            </label>
-                            <span className="text-[11px] font-bold text-stone-500">
-                              Units produced
-                            </span>
-                          </div>
-
-                          {/* Quick Pieces Presets */}
-                          <div className="flex flex-wrap gap-1.5">
-                            {[50, 100, 150, 200, 250, 300, 500].map((pQty) => (
-                              <button
-                                key={pQty}
-                                type="button"
-                                onClick={() => handleUpdateBreadPieces(bread.productId, pQty)}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                                  breadPieces === pQty
-                                    ? 'bg-[#0E7452] text-white shadow-xs'
-                                    : 'bg-white border border-stone-200 text-stone-700 hover:bg-stone-100'
-                                }`}
-                              >
-                                {pQty} pcs
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Numeric input with +/- step */}
-                          <div className="flex items-center space-x-2 pt-1">
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateBreadPieces(bread.productId, Math.max(0, breadPieces - 25))}
-                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
-                            >
-                              -
-                            </button>
-                            <div className="relative flex-1">
-                              <input
-                                type="number"
-                                min="0"
-                                step="1"
-                                value={bread.pieces}
-                                onChange={(e) => handleUpdateBreadPieces(bread.productId, e.target.value)}
-                                className="w-full bg-white border-2 border-stone-300 focus:border-[#0E7452] rounded-xl px-3 py-2 text-lg font-black text-[#0E7452] text-center focus:outline-none"
-                              />
-                              <span className="absolute right-3 top-2.5 text-xs font-bold text-stone-400">pcs</span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateBreadPieces(bread.productId, breadPieces + 25)}
-                              className="w-10 h-10 rounded-xl bg-white border border-stone-300 hover:bg-stone-100 font-black text-lg text-stone-700 flex items-center justify-center active:scale-95 cursor-pointer shadow-2xs"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Batch Consolidated Summary Card */}
@@ -1561,11 +1472,11 @@ export default function BakerDashboard({
                 </div>
               </div>
 
-              {/* Step 4 Footer Navigation */}
+              {/* Step 3 Footer Navigation */}
               <div className="pt-2 flex items-center justify-between border-t border-stone-100">
                 <button
                   type="button"
-                  onClick={() => jumpToStep(3)}
+                  onClick={() => jumpToStep(2)}
                   className="text-stone-600 hover:text-stone-900 text-xs font-black px-4 py-2.5 rounded-xl hover:bg-stone-100 transition-all flex items-center space-x-1.5 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -1573,7 +1484,7 @@ export default function BakerDashboard({
                 </button>
                 <button
                   type="button"
-                  onClick={() => jumpToStep(5)}
+                  onClick={() => jumpToStep(4)}
                   className="bg-[#0E7452] hover:bg-[#0A573D] text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
                 >
                   <span>Next: Review & Complete Baking ({totalPieces} pcs)</span>
@@ -1583,19 +1494,19 @@ export default function BakerDashboard({
             </div>
           )}
 
-          {/* STEP 5: PRODUCTION OUTPUT & ITEMIZE TRANSFER TO CASHIER */}
-          {(viewMode === 'scroll' || activeStep === 5) && (
+          {/* STEP 4: PRODUCTION OUTPUT & ITEMIZE TRANSFER TO CASHIER */}
+          {(viewMode === 'scroll' || activeStep === 4) && (
             <div 
-              ref={step5Ref}
+              ref={step4Ref}
               className={`bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6 transition-all duration-300 ${
-                highlightedStep === 5 ? 'ring-4 ring-emerald-500/40' : ''
+                highlightedStep === 4 ? 'ring-4 ring-emerald-500/40' : ''
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
                 <div>
                   <h2 className="text-lg font-black text-stone-900 flex items-center space-x-2">
                     <span className="w-8 h-8 rounded-full bg-[#0E7452] text-white inline-flex items-center justify-center text-sm font-black shadow-xs shrink-0">
-                      5
+                      4
                     </span>
                     <span>Review & Transfer Finished Stock to Cashier:</span>
                   </h2>
@@ -1700,15 +1611,15 @@ export default function BakerDashboard({
                 </span>
               </button>
 
-              {/* Back to Step 4 */}
+              {/* Back to Step 3 */}
               <div className="text-center pt-2">
                 <button
                   type="button"
-                  onClick={() => jumpToStep(4)}
+                  onClick={() => jumpToStep(3)}
                   className="text-stone-500 hover:text-stone-900 text-xs font-black inline-flex items-center space-x-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Dough Weight & Quantities</span>
+                  <span>Back to Varieties & Weights</span>
                 </button>
               </div>
             </div>
