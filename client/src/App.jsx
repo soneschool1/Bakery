@@ -8,6 +8,7 @@ import BakerDashboard from './components/Baker/BakerDashboard';
 import CashierDashboard from './components/Cashier/CashierDashboard';
 import AdminPanel from './components/Admin/AdminPanel';
 import LoginPage from './components/Auth/LoginPage';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { api, setupSSE } from './services/api';
 import { useTranslation } from './i18n/LanguageContext';
 import { 
@@ -665,108 +666,114 @@ export default function App() {
         
         {/* Baker Interface */}
         {currentUser?.role === 'baker' && (
-          <BakerDashboard
-            baker={currentUser}
-            products={products}
-            rawMaterials={rawMaterials}
-            batches={batches}
-            suggestions={suggestions}
-            onCreateBatch={handleCreateBatch}
-            onEditBatch={handleEditBatch}
-            onSubmitStockCheck={handleSubmitStockCheck}
-            onApproveStockCheck={handleApproveStockCheck}
-            isSubmitting={isSubmitting}
-          />
+          <ErrorBoundary title="Baker Station Error">
+            <BakerDashboard
+              baker={currentUser}
+              products={products}
+              rawMaterials={rawMaterials}
+              batches={batches}
+              suggestions={suggestions}
+              onCreateBatch={handleCreateBatch}
+              onEditBatch={handleEditBatch}
+              onSubmitStockCheck={handleSubmitStockCheck}
+              onApproveStockCheck={handleApproveStockCheck}
+              isSubmitting={isSubmitting}
+            />
+          </ErrorBoundary>
         )}
 
         {/* Cashier Interface */}
         {currentUser?.role === 'cashier' && (
-          <CashierDashboard
-            cashier={currentUser}
-            products={products}
-            finishedStock={finishedStock}
-            branches={branches}
-            rawMaterials={rawMaterials}
-            transfers={transfers}
-            closings={closings}
-            closingSummary={closingSummary}
-            deposits={deposits}
-            expenses={variableExpenses}
-            flourTracker={flourTracker}
-            suggestions={suggestions}
-            stockChecks={stockChecks}
-            onCompleteSale={handleCompleteSale}
-            onSendTransfer={handleSendTransfer}
-            onReceiveTransfer={handleReceiveTransfer}
-            onSubmitClosing={handleSubmitClosing}
-            onReviewClosing={handleReviewClosing}
-            onRecordDeposit={handleRecordDeposit}
-            onAddExpense={handleAddExpense}
-            onSubmitStockCheck={handleSubmitStockCheck}
-            onApproveStockCheck={handleApproveStockCheck}
-            onCreateBranch={handleCreateBranch}
-            onUpdateBranch={handleUpdateBranch}
-            onCreateProduct={handleAddProduct}
-            onUpdateProduct={handleUpdateProduct}
-            onAddMaterial={handleAddMaterial}
-            isSubmitting={isSubmitting}
-          />
+          <ErrorBoundary title="Cashier Station Error">
+            <CashierDashboard
+              cashier={currentUser}
+              products={products}
+              finishedStock={finishedStock}
+              branches={branches}
+              rawMaterials={rawMaterials}
+              transfers={transfers}
+              closings={closings}
+              closingSummary={closingSummary}
+              deposits={deposits}
+              expenses={variableExpenses}
+              flourTracker={flourTracker}
+              suggestions={suggestions}
+              stockChecks={stockChecks}
+              onCompleteSale={handleCompleteSale}
+              onSendTransfer={handleSendTransfer}
+              onReceiveTransfer={handleReceiveTransfer}
+              onSubmitClosing={handleSubmitClosing}
+              onReviewClosing={handleReviewClosing}
+              onRecordDeposit={handleRecordDeposit}
+              onAddExpense={handleAddExpense}
+              onSubmitStockCheck={handleSubmitStockCheck}
+              onApproveStockCheck={handleApproveStockCheck}
+              onCreateBranch={handleCreateBranch}
+              onUpdateBranch={handleUpdateBranch}
+              onCreateProduct={handleAddProduct}
+              onUpdateProduct={handleUpdateProduct}
+              onAddMaterial={handleAddMaterial}
+              isSubmitting={isSubmitting}
+            />
+          </ErrorBoundary>
         )}
 
         {/* Admin Interface */}
         {currentUser?.role === 'admin' && (
-          <AdminPanel
-            admin={currentUser}
-            dashboardData={dashboardData}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            customStart={customStart}
-            setCustomStart={setCustomStart}
-            customEnd={customEnd}
-            setCustomEnd={setCustomEnd}
-            onRefreshDashboard={loadDashboard}
-            batches={batches}
-            rawMaterials={rawMaterials}
-            finishedStock={finishedStock}
-            products={products}
-            fixedExpenses={fixedExpenses}
-            expenses={variableExpenses}
-            suggestions={suggestions}
-            users={allUsers}
-            branches={branches}
-            auditLogs={auditLogs}
-            stockChecks={stockChecks}
-            onCancelBatch={handleCancelBatch}
-            onEditBatch={handleEditBatch}
-            onAddMaterial={handleAddMaterial}
-            onUpdateMaterial={api.updateRawMaterial}
-            onDeleteMaterial={handleDeleteMaterial}
-            onAdjustStock={handleAdjustStock}
-            onAdjustFinishedStock={handleAdjustFinishedStock}
-            onApproveStockCheck={handleApproveStockCheck}
-            onAddProduct={handleAddProduct}
-            onUpdateProduct={handleUpdateProduct}
-            onDeleteProduct={handleDeleteProduct}
-            onAddFixedExpense={handleAddFixedExpense}
-            onUpdateFixedExpense={api.updateFixedExpense}
-            onDeleteFixedExpense={handleDeleteFixedExpense}
-            onAddSuggestion={handleAddSuggestion}
-            onUpdateSuggestion={handleUpdateSuggestion}
-            onDeleteSuggestion={handleDeleteSuggestion}
-            onAddUser={handleAddUser}
-            onUpdateUser={handleUpdateUser}
-            onDeleteUser={handleDeleteUser}
-            onSwitchRole={(role) => {
-              const target = allUsers.find(u => u.role === role) || {
-                id: role === 'cashier' ? '6af07ccc1810e6c735504360' : '6af07ccc1810e6c73550435f',
-                role,
-                full_name: role === 'baker' ? 'Dawit Alemu (Head Baker)' : 'Tigist Haile (Cashier)',
-                username: role,
-                branch_id: '6af07ccc1810e6c73550435a',
-              };
-              setCurrentUser(target);
-            }}
-          />
+          <ErrorBoundary title="Admin Panel Error">
+            <AdminPanel
+              admin={currentUser}
+              dashboardData={dashboardData}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              customStart={customStart}
+              setCustomStart={setCustomStart}
+              customEnd={customEnd}
+              setCustomEnd={setCustomEnd}
+              onRefreshDashboard={loadDashboard}
+              batches={batches}
+              rawMaterials={rawMaterials}
+              finishedStock={finishedStock}
+              products={products}
+              fixedExpenses={fixedExpenses}
+              expenses={variableExpenses}
+              suggestions={suggestions}
+              users={allUsers}
+              branches={branches}
+              auditLogs={auditLogs}
+              stockChecks={stockChecks}
+              onCancelBatch={handleCancelBatch}
+              onEditBatch={handleEditBatch}
+              onAddMaterial={handleAddMaterial}
+              onUpdateMaterial={api.updateRawMaterial}
+              onDeleteMaterial={handleDeleteMaterial}
+              onAdjustStock={handleAdjustStock}
+              onAdjustFinishedStock={handleAdjustFinishedStock}
+              onApproveStockCheck={handleApproveStockCheck}
+              onAddProduct={handleAddProduct}
+              onUpdateProduct={handleUpdateProduct}
+              onDeleteProduct={handleDeleteProduct}
+              onAddFixedExpense={handleAddFixedExpense}
+              onUpdateFixedExpense={api.updateFixedExpense}
+              onDeleteFixedExpense={handleDeleteFixedExpense}
+              onAddSuggestion={handleAddSuggestion}
+              onUpdateSuggestion={handleUpdateSuggestion}
+              onDeleteSuggestion={handleDeleteSuggestion}
+              onAddUser={handleAddUser}
+              onUpdateUser={handleUpdateUser}
+              onDeleteUser={handleDeleteUser}
+              onSwitchRole={(role) => {
+                const target = allUsers.find(u => u.role === role) || {
+                  id: role === 'cashier' ? '6af07ccc1810e6c735504360' : '6af07ccc1810e6c73550435f',
+                  role,
+                  full_name: role === 'baker' ? 'Dawit Alemu (Head Baker)' : 'Tigist Haile (Cashier)',
+                  username: role,
+                  branch_id: '6af07ccc1810e6c73550435a',
+                };
+                setCurrentUser(target);
+              }}
+            />
+          </ErrorBoundary>
         )}
 
         </main>

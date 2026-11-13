@@ -734,7 +734,7 @@ export default function POSView({
               {cart.reduce((sum, item) => sum + item.quantity, 0)}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-black truncate">{formatETB(chargedTotal)}</div>
+              <div className="text-xs font-black truncate">{formatETB(totalAmount)}</div>
               <div className="text-[10px] text-emerald-200 font-medium truncate">
                 {cart.length} item{cart.length > 1 ? 's' : ''} in cart
               </div>

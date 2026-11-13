@@ -92,7 +92,8 @@ export default function StockRechargeForm({
   // When material selection changes (with animated transition & auto-advance)
   function handleSelectMaterial(mat, autoScroll = true) {
     if (!mat) return;
-    setSelectedMaterialId(mat.id);
+    const matId = mat.id || mat._id;
+    setSelectedMaterialId(matId);
 
     const preset = materialPresets.find(p => p.name.toLowerCase() === mat.name.toLowerCase());
     let defaultQ = preset ? preset.defaultQty : (mat.unit === 'g' ? 500 : (mat.unit === 'kg' ? 50 : 500));
@@ -101,7 +102,7 @@ export default function StockRechargeForm({
     setSupplierName(mat.supplier || '');
 
     if (autoScroll) {
-      setAnimatingMaterialId(mat.id);
+      setAnimatingMaterialId(matId);
       setAutoAdvanceNotice(`✨ Selected ${mat.name}! Automatically moving to Step 2...`);
 
       setTimeout(() => {
@@ -295,7 +296,7 @@ export default function StockRechargeForm({
               <div className="flex flex-wrap gap-2 mt-3">
                 {lowMaterials.map(m => (
                   <button
-                    key={m.id}
+                    key={m.id || m._id || m.name}
                     type="button"
                     onClick={() => handleSelectMaterial(m, true)}
                     className="bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-xs transition-all flex items-center space-x-2 cursor-pointer active:scale-95"
@@ -354,16 +355,17 @@ export default function StockRechargeForm({
 
         {/* Grid of Materials */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {rawMaterials.map((mat) => {
-            const isSelected = selectedMaterial?.id === mat.id;
-            const isAnimating = animatingMaterialId === mat.id;
+          {safeMaterials.map((mat) => {
+            const matId = mat.id || mat._id;
+            const isSelected = (selectedMaterial?.id || selectedMaterial?._id) === matId;
+            const isAnimating = animatingMaterialId === matId;
             const isLow = mat.current_quantity <= mat.minimum_stock;
             const preset = materialPresets.find(p => p.name.toLowerCase() === mat.name.toLowerCase());
             const icon = preset?.icon || (mat.category === 'packaging' ? '📦' : '🧪');
 
             return (
               <button
-                key={mat.id}
+                key={matId || mat.name}
                 type="button"
                 onClick={() => handleSelectMaterial(mat, true)}
                 className={`p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer relative flex flex-col justify-between ${
